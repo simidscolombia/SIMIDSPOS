@@ -1,0 +1,295 @@
+<div class="container-fluid">
+
+    <!-- TITLE - SUBTITLE -->
+    <div>
+        <h5 class="text-dark">FACTURAS DE VENTAS A CREDITO</h5>
+        <p>Lista de todas las facturas de ventas a credito.</p>
+    </div>
+    <!-- TITLE - SUBTITLE -->
+
+    <div class="col-12">
+
+        <div class="d-flex flex-wrap gap-2">
+
+            <div class="col-xl-3 col-md-3 mb-4">
+                <!-- Dashboard info widget 1-->
+                <div class="card border-top-0 border-bottom-0 border-end-0 border-left-lg border-primary h-100 bg-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="flex-grow-1">
+                                <div class="small font-weight-bold text-primary mb-1">Monto Total Facturas</div>
+                                <div class="h5">({{totalAmount | divisa}})</div>
+                                <div class="text-xs font-weight-bold text-success d-inline-flex align-items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up mr-1"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                </div>
+                            </div>
+                            <div class="ms-2">
+                                <i class="bi bi-receipt text-muted" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-3 mb-4">
+                <!-- Dashboard info widget 1-->
+                <div class="card border-top-0 border-bottom-0 border-end-0 border-left-lg border-success h-100 bg-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="flex-grow-1">
+                                <div class="small font-weight-bold text-success mb-1">Abonado</div>
+                                <div class="h5"> {{ totalAbonado | divisa }} </div>
+                                <div class="text-xs font-weight-bold text-success d-inline-flex align-items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up mr-1"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                </div>
+                            </div>
+                            <div class="ms-2">
+                                <i class="bi bi-cash text-muted" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-3 mb-4">
+                <!-- Dashboard info widget 1-->
+                <div class="card border-top-0 border-bottom-0 border-end-0 border-left-lg border-warning h-100 bg-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="flex-grow-1">
+                                <div class="small font-weight-bold text-warning mb-1">Pendiente por cobrar</div>
+                                <div class="h5"> {{ totalAmount - totalAbonado | divisa }} </div>
+                                <div class="text-xs font-weight-bold text-warning d-inline-flex align-items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up mr-1"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                </div>
+                            </div>
+                            <div class="ms-2">
+                                <i class="bi bi-cash text-muted" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <ng-container *ngIf="empresa">
+                <div class="col-xl-3 col-md-3 mb-4" *ngFor="let impuesto of impuestos">
+                    <!-- Dashboard info widget 1-->
+                    <div class="card border-top-0 border-bottom-0 border-end-0 border-left-lg border-info h-100 bg-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center flex-wrap">
+                                <div class="flex-grow-1">
+                                    <div class="small font-weight-bold text-info mb-1"> {{ impuesto.name }} </div>
+                                    <div class="h5"> ({{ impuesto.total | divisa}}) </div>
+                                </div>
+                                <div class="ms-2">
+                                    <i class="bi bi-cash text-muted" style="font-size: 1.5rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="shadow-lg p-3 mb-5 rounded bg-white">
+
+                <!-- BUSCADOR DE CLIENTES  -->
+                <div class="mb-3">
+                    <h4 class="text-muted">Buscar Cliente</h4>
+                    <div>
+                        <input type="text" class="form-control" placeholder="buscar cliente" (keyup)="buscarCliente(searchClient.value)" #searchClient>
+                    </div>
+
+                    <div *ngIf="listaClientes.length > 0" class="bg-white py-3 px-2 shadow" style="position: absolute; z-index: 1020;">
+
+                        <div *ngIf="cargandoCliente" class="text-center py-3">
+                            <div class="spinner-grow text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div>
+                                <small class="text-muted">Cargando...</small>
+                            </div>
+                        </div>
+
+                        <ul *ngIf="!cargandoCliente" class="list-group list-group-flush overflow-auto" style="max-height: 200px; min-width: 250px;">
+
+                            <li class="list-group-item">
+                                <h6>Resultados: ({{ listaClientes.length }})</h6>
+                            </li>
+
+                            <li class="list-group-item" *ngFor="let item of listaClientes">
+                                <div class="d-flex ">
+                                    <div class="align-self-center">
+                                        <span class="text-capitalize fw-bold"> {{ item.name }} </span><br>
+                                        <small> C.C: {{ item.cedula }} </small>
+                                    </div>
+
+                                    <div class="ms-auto">
+                                        <button class="btn btn-link p-1 text-success float-end" (click)="searchInvoice(item.cid)"> <i class="bi-arrow-90deg-right"></i></button>
+                                    </div>
+                                </div>
+
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+                <!-- BUSCADOR DE CLIENTES  -->
+
+                <!-- BUSCADOR DE VENDEDOR MESAS  -->
+
+                <div class="mb-3">
+                    <h4 class="text-muted">Vendedores</h4>
+
+                    <div class="mb-2">
+                        <select class="form-select" aria-label="Default select example" #cajeros>
+                            <option value="none" selected>Todos</option>
+                            <option [value]="vendedor.mid" *ngFor="let vendedor of listaMesas">{{vendedor.mesero.name}}</option>
+                         </select>
+                    </div>
+
+                    <button (click)="buscarVendedores(cajeros.value)" type="button" name="" id="" class="btn btn-primary"> Buscar facturas</button>
+
+                </div>
+
+                <!-- BUSCADOR DE VENDEDOR MESAS  -->
+                <!-- BUSCADOR POR FECHAS  -->
+
+                <div class="">
+
+                    <div class="form-group">
+                        <label class="" for="">Desde</label>
+                        <input type="datetime-local" class="form-control" (change)="initial.value" #initial>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="" for="">Hasta</label>
+                        <input type="datetime-local" class="form-control" (change)="end.value" #end>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-outline-primary btn-sm py-auto w-100" (click)="buscar(initial.value, end.value, cajeros.value, true, true)"> 
+                            <i class="bi-search"></i> Buscar 
+                        </button>
+                    </div>
+                </div>
+                <!-- BUSCADOR POR FECHAS  -->
+
+            </div>
+
+        </div>
+        <!-- TABLE FACTURAS -->
+        <div class="col-md-9">
+
+            <div class="shadow-lg p-3 mb-5 rounded bg-white">
+
+                <!-- CARGANDO -->
+                <div *ngIf="cargando">
+                    <div class="text-center p-4">
+                        <div class="spinner-grow text-secondary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <small class="text-muted">cargando...</small>
+                </div>
+                <!-- CARGANDO -->
+
+                <div *ngIf="!cargando">
+
+                    <!-- BUSCADOR -->
+                    <div class="d-flex">
+
+                        <div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" (click)="cargarFacturas()"> <i class="bi-arrow-clockwise"></i> Recargar </button>
+                            <button type="button" class="ml-2 btn btn-outline-success btn-sm" (click)="exportar()"> <i class="bi-file-earmark-spreadsheet"></i> Excel </button>
+                        </div>
+
+                        <div class="ms-2">
+                            <button type="button" class="btn btn-outline-danger btn-sm" (click)="facturasVencidas()"> <i class="bi-arrow-clockwise"></i> Vencidas </button>
+                        </div>
+
+                    </div>
+                    <!-- BUSCADOR -->
+
+                    <div class="table-responsive ">
+                        <table class="table table-borderless table-striped table-hover table-sm animated fadeIn ">
+                            <thead class="border-bottom ">
+                                <tr>
+                                    <th class="text-muted" scope="col ">#</th>
+                                    <th class="text-muted" scope="col ">control</th>
+                                    <th class="text-muted" scope="col " colspan="2">Cliente</th>
+                                    <th class="text-muted" scope="col ">Cedula</th>
+                                    <th class="text-muted" scope="col " colspan="2">Ruta</th>
+                                    <th class="text-muted" scope="col ">Monto</th>
+                                    <th class="text-muted" scope="col ">Metodo</th>
+                                    <th class="text-muted" scope="col ">fecha</th>
+                                    <th class="text-muted" scope="col "></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="!sinResultados" class="text-center ">
+                                    <th colspan="10" class="py-4">
+                                        <h4 class="text-muted">Sin Resultados</h4>
+                                    </th>
+                                </tr>
+
+                                <ng-container *ngFor="let factura of facturas; let i=index ">
+
+                                    <tr *ngIf="factura.credito" class="trHover" tabindex="0" data-bs-toggle="tooltip" title="Cajero: {{ factura.user.name }}">
+                                        <th>{{ factura.invoice }}</th>
+                                        <th>{{ factura.control }}</th>
+                                        <td colspan="2">
+                                            {{ factura.client?.name || 'Ocasional' }}
+                                            <span *ngIf="!factura.status" class="badge rounded-pill bg-danger">Cancelada</span>
+                                            <span *ngIf="factura.vencida && factura.status" class="badge rounded-pill bg-danger">Vencida</span>
+                                            <span *ngIf="factura.mayor" class="badge rounded-pill bg-success">M </span>
+                                        </td>
+                                        <td> {{ factura.client?.cedula || '00000000' }} </td>
+                                        <td colspan="2"> {{ factura.mesa?.name }} </td>
+                                        <td> {{ factura.amount | divisa }} </td>
+                                        <td> {{ factura.type }} </td>
+                                        <td> {{ factura.fecha | date:'medium' }} </td>
+                                        <td class="text-center">
+                                            <a [routerLink]="['/dashboard/factura', factura.iid]" class="btn btn-link p-1 text-primary"><i class="bi bi-box-arrow-up-right"></i></a>
+                                        </td>
+                                    </tr>
+
+                                </ng-container>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- BTN SIGUIENTE Y ANTERIOR -->
+                    <div class="row">
+                        <div class="col col-md-4">
+                            <small class="text-muted">Total de facturas: ({{totalFacturas}})</small>
+                            <small *ngIf="resultado !== 0" class="text-muted"> - (Resultados: {{ resultado }})</small>
+                            <small *ngIf="desde !== 0" class="text-muted"> - (Desde el: {{ desde + 1}} Hasta el: {{ desde + facturas.length }})</small>
+                            <small *ngIf="sumarMonto !== 0" class="text-muted"> - Monto: ({{sumarMonto}})</small>
+
+                        </div>
+
+                        <div class="col d-flex justify-content-end">
+                            <button type="button" (click)="cambiarPagina(-10)" class="{{btnAtras}} btn btn-sm btn-dark btnW waves-effect waves-light px-3">Anterior</button>
+                            <button type="button" (click)="cambiarPagina(10)" class="{{btnAdelante}} btn btn-sm btn-dark btnW waves-effect waves-light px-3 ms-2">Siguiente</button>
+                        </div>
+                    </div>
+                    <!-- BTN SIGUIENTE Y ANTERIOR -->
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- TABLE FACTURAS -->
+
+    </div>
+
+</div>
