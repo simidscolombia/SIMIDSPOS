@@ -1,0 +1,836 @@
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+<header>
+    <div class="bg-header-yellow py-2 px-3 mb-2">
+        <h5 class="text-white m-0">PRODUCTOS</h5>
+    </div>
+    <ul class="nav nav-tabs px-3" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link text-dark active" id="nuevo-tab">
+                <i class="bi-pencil" style="font-size: 1rem"></i> Editar Producto
+            </a>
+        </li>
+    </ul>
+</header>
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+
+<!-- =========================================================================
+    BODY 
+========================================================================= -->
+<div class="container-fluid my-4">
+
+    <div class="row">
+
+        <!-- IMAGE -->
+        <div class="col-lg-4 text-center">
+
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+
+                    <p class="mb-0">Stock</p>
+                    <ng-container *ngIf="producto">
+                        <h4 class="display-6" *ngIf="producto.type != 'Granel'">
+                            {{ producto.inventario | number }}
+                        </h4>
+                        <h4 class="display-6" *ngIf="producto.type === 'Granel'">
+                            {{ producto.inventario | number:'1.3' }}
+                        </h4>
+                    </ng-container>
+
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-2 mb-4">
+                <button data-bs-toggle="modal" data-bs-target="#ajustarInventario" class="btn btn-dark" type="button"> 
+                    <i class="bi-card-checklist"></i> Ajustar Inventario
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-body text-center">
+                    <!-- Image Product-->
+                    <!-- <img class="img-fluid rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/300x300"> -->
+                    <!-- <div class="avatar-redondo-lg mx-auto" style="background-image: url(https://www.alimentosmary.com/wp-content/uploads/2017/08/arroz-tradicional-4.jpg)">
+                    </div> -->
+
+                    <!-- Image Product-->
+                    <img *ngIf="!imgTemp" [src]="productoImg | imagen:'products'" class="avatar-redondo-lg mx-auto" alt="">
+
+                    <!-- IMG TEMPO  imgTemp -->
+                    <img *ngIf="imgTemp" [src]="imgTemp" class="avatar-redondo-lg mx-auto" alt="">
+
+                    <!-- Description-->
+                    <div class="small font-italic text-muted mb-4">JPG - PNG - WEBP - no mayor a 5 mb</div>
+                    <div class="mb-3">
+                        <label for="formFileSm" class="form-label">Seleccionar Imagen</label>
+                        <input #fileImg class="form-control form-control-sm" id="formFileSm" type="file" (change)="cambiarImage($event.target.files[0])">
+                    </div>
+                    <!-- BTN upload Image -->
+                    <button *ngIf="imgTemp" class="btn btnW btn-primary waves-effect waves-light px-3" [disabled]="!subirImagen" (click)="subirImg()" type="button">Actualizar Imagen</button>
+
+                </div>
+            </div>
+
+
+
+        </div>
+        <!-- IMAGE -->
+
+        <!-- INFO PRODUCT -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex" *ngIf="producto">
+                    <div>
+                        Informacion del producto <span *ngIf="!producto.status" class="text-danger">Eliminado</span>
+                    </div>
+
+                    <button (click)="borrarProducto(producto.pid)" type="button" class="btn btn-sm ms-auto" [ngClass]="{'btn-success': !producto.status, 'btn-danger': producto.status}">
+                        <span *ngIf="producto.status"> <i class="bi-trash"></i> Eliminar</span>
+                        <span *ngIf="!producto.status"> <i class="bi-check"></i> Activar</span>
+                    </button>
+
+                </div>
+                <div class="card-body">
+
+                    <!-- FORM -->
+
+                    <form id="upProductForm" autocomplete="off" [formGroup]="upProductForm" (ngSubmit)="actualizarProducto()">
+
+                        <!-- =======================================================================
+                            DATOS 
+                        =========================================================================== -->
+                        <h5 class="text-muted">Producto</h5>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 px-md-1">
+
+                                <div class="form-floating">
+                                    <input formControlName="code" type="text" class="form-control text-capitalize" placeholder="Codigo de barras">
+                                    <label for="floatingInput">Codigo de barras</label>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 px-md-1 ">
+
+                                <div class="form-floating">
+                                    <input formControlName="sku" type="text" class="form-control" placeholder="Sku del producto">
+                                    <label for="floatingInput">Sku del producto</label>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="row mb-3">
+
+                            <div class="col-md-6 px-md-1">
+
+                                <div class="form-floating">
+                                    <input formControlName="name" type="text" class="form-control" placeholder="Nombre del producto">
+                                    <label for="floatingInput">Nombre del producto</label>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 px-md-1 ">
+
+                                <div class="form-floating">
+                                    <input formControlName="brand" type="text" class="form-control" placeholder="Marca del producto">
+                                    <label for="floatingInput">Marca del producto</label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-12 px-md-1 mt-3">
+                                <div class="form-floating">
+                                    <textarea formControlName="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                                    <label for="floatingInput">Description</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <h5 class="text-muted">Tipo</h5>
+                        <div class="row mb-3">
+
+                            <div class="col-md-12 px-md-1">
+
+                                <div class="form-floating">
+                                    <select class="form-select" id="floatingSelectType" aria-label="Floating label select example" formControlName="type" #type>
+                                        <option selected value="0">Seleccionar Tipo</option>
+                                        <option value="Unidad">Unidad</option>
+                                        <option value="Granel">Granel</option>
+                                        <option value="Paquete">Paquete</option>
+                                    </select>
+                                    <label for="floatingSelect">Seleccionar Tipo</label>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="row mb-3" *ngIf="type.value === 'Paquete'">
+
+                            <div class="col-md-4 px-md-1">
+                                <div class="form-check mt-2">
+                                    <input formControlName="bascula" class="form-check-input" type="checkbox" id="basc" #basc>
+                                    <label class="form-check-label" for="basc">
+                                        Bacula
+                                    </label>
+                                </div>
+                            </div>
+
+                            <h6 class="text-muted">Agregar Productos</h6>
+                            <hr>
+
+                            <!-- KIT -->
+                            <!-- KIT -->
+                            <div class="col-md-12 px-md-1 mb-3">
+
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" placeholder="Buscar Producto" (keyup)="buscar(search.value)" #search>
+                                    <label for="floatingInput">Buscar Producto</label>
+                                </div>
+
+                                <div *ngIf="sinResultados" class="bg-white py-3 px-2 shadow col-10" style="position: absolute; z-index: 1020;">
+                                    <h6 class="text-muted">Sin resultados</h6>
+                                </div>
+
+                                <div *ngIf="searchProduct.length > 0" class="bg-white py-3 px-2 shadow col-10" style="position: absolute; z-index: 1020;">
+
+                                    <div *ngIf="cargando" class="text-center py-3">
+                                        <div class="spinner-grow text-secondary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted">Cargando...</small>
+                                        </div>
+                                    </div>
+
+
+
+                                    <ul *ngIf="!cargando" class="list-group list-group-flush overflow-auto" style="max-height: 200px;">
+
+                                        <li class="list-group-item">
+                                            <h6>Resultados: ({{ searchProduct.length }})</h6>
+                                        </li>
+                                        <li class="list-group-item" *ngFor="let item of searchProduct">
+                                            <div class="d-flex ">
+                                                <div class="align-self-center">
+                                                    <span> {{ item.name }} </span>
+                                                </div>
+
+                                                <div class="ms-auto">
+                                                    <button class="btn btn-link p-1 text-success float-end" (click)="seleccionarProducto(item)"> <i class="bi-arrow-90deg-right"></i></button>
+                                                </div>
+                                            </div>
+
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+
+                            <div class="row mb-3">
+
+
+                                <div class="col-md-5 px-md-1">
+
+                                    <input type="text" disabled class="form-control" placeholder="Producto" [value]="inProducto">
+
+                                </div>
+
+                                <div class="col-md-5 px-md-1">
+
+                                    <input type="number" class="form-control" min="0" placeholder="Cantidad" #qty>
+
+                                </div>
+
+                                <div class="col-md-2 px-md-1">
+
+                                    <button type="button" (click)="agregarProductoKit(qty.value)" class="{{btnAddKit}} btn btnW waves-effect waves-ligth px-3 btn-success"><i class="bi-plus" style="font-size: 1rem"></i> </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-12 px-md-1">
+
+                                <div class="border border-redounded py-2 px-2">
+
+                                    <table class="table table-sm table-borderless table-striped table-hover">
+                                        <thead class="border-bottom">
+                                            <tr class="text-muted">
+                                                <th scope="col" style="width: 30px;">#</th>
+                                                <th scope="col">Nombre</th>
+                                                <th scope="col">Cantidad</th>
+                                                <th scope="col"></th>
+                                            </tr>
+
+                                        </thead>
+                                        <tbody>
+
+
+                                            <tr class="trHover" *ngFor="let kitP of kits; let i=index">
+                                                <th scope="row"><small>{{i + 1}}</small></th>
+                                                <td><small>{{kitP.product.name}}</small></td>
+                                                <td><small>{{kitP.qty}}</small></td>
+                                                <td><button class="btn btn-link p-1 text-danger" (click)="eliminarProductoKit(kitP)"><small class="bi-trash" style="font-size: 0.9rem"></small> </button></td>
+                                            </tr>
+
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <!-- KIT -->
+                        <!-- KIT -->
+                        <!-- =======================================================================
+                            PRECIO
+                        =========================================================================== -->
+                        <!-- IMPUESTO -->
+                        <div class="row mb-3">
+
+                            <div class="col-md-4 px-md-1">
+                                <div class="form-check mt-2">
+                                    <input formControlName="tax" class="form-check-input" type="checkbox" value="" id="tax" #tax>
+                                    <label class="form-check-label" for="tax">
+                                      Impuesto
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8 px-md-1">
+
+                                <div class="form-floating">
+                                    <select class="form-select" id="floatingSelectIva" aria-label="Floating label select example" value="0" formControlName="taxid" (change)="selectTax = taxS.value" #taxS>
+    
+                                        <option value=""> Seleccionar el impuesto</option>                                      
+                                        <option [value]="impuesto.taxid" *ngFor="let impuesto of impuestos"> {{ impuesto.name }} - {{ impuesto.valor }} </option>                                      
+                                    
+                                    </select>
+                                    <label for="floatingSelectIva">Tipo de impuesto</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- IMPUESTO -->
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-4 px-md-1">
+
+                                <div class="form-floating">
+                                    <input formControlName="cost" type="number" class="form-control" min="0" (keyup)="porcentaje('costo', costo.value)" [value]="costoN" placeholder="costo" #costo>
+                                    <label for="floatingInput">costo</label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 px-md-1">
+
+                                <div class="form-floating">
+                                    <input formControlName="gain" type="number" class="form-control" min="0" (change)="porcentaje('ganancia', ganancia.value)" [value]="gananciaN" placeholder="Ganancia" #ganancia>
+                                    <label for="floatingInput">Ganancia</label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 px-md-1">
+
+                                <div class="form-floating">
+                                    <input formControlName="price" type="number" class="form-control" min="0" (change)="porcentaje('precio', precio.value)" [value]="precioN" placeholder="Precio" #precio>
+                                    <label for="floatingInput">Precio</label>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-4 px-md-1" *ngIf="tax.checked">
+
+
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" (change)="precioIva()" [value]="priceIva" placeholder="Precio con IVA" #pIva>
+                                    <label for="floatingInput">Precio con IVA</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 px-md-1">
+
+                                <div class="form-floating">
+                                    <input formControlName="wholesale" type="text" class="form-control" placeholder="Al Mayor">
+                                    <label for="floatingInput">Al Mayor</label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 px-md-1">
+
+                                <div class="form-floating">
+                                    <input formControlName="distribuidor" type="text" class="form-control" placeholder="Precio distribuidor">
+                                    <label for="floatingInput">Al Distribuidor</label>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- KIT -->
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-6 px-md-1">
+
+                                <div class="form-floating">
+                                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="department">
+                                        <option selected value="0">Seleccionar Departamento</option>
+                                        <option value="00">Sin Departamento</option>
+                                        <ng-container *ngFor="let departmento of departamentos">
+                                            <option *ngIf="departmento.status" value="{{departmento.did}}">{{departmento.name}}</option>
+                                        </ng-container>
+                                    </select>
+                                    <label for="floatingSelect">Seleccionar Departamento</label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6 px-md-1">
+
+                                <div class="form-floating">
+                                    <input formControlName="expiration" type="date" class="form-control" placeholder="Fecha de vencimiento">
+                                    <label for="floatingInput">Fecha de vencimiento</label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- KIT -->
+                        <ng-container *ngIf="producto">
+
+                            <div class="row mb-3" *ngIf="producto.type !== 'Paquete'">
+
+                                <div class="col-md-6 px-md-1">
+
+                                    <div class="form-floating">
+                                        <input formControlName="min" type="text" class="form-control" placeholder="Minimo">
+                                        <label for="floatingInput">Minimo</label>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6 px-md-1">
+
+                                    <div class="form-floating">
+                                        <input formControlName="max" type="text" class="form-control" placeholder="Maximo">
+                                        <label for="floatingInput">Maximo</label>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="row mb-3">
+
+                                <div class="col-md-6 px-md-1">
+
+                                    <div class="form-floating">
+                                        <input formControlName="mayoreo" type="text" class="form-control" placeholder="Mayoreo apartir de">
+                                        <label for="floatingInput">Mayoreo apartir de</label>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </ng-container>
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-6 px-md-1">
+                                <div class="form-check mt-2">
+                                    <input formControlName="comanda" class="form-check-input" type="checkbox" value="" id="checkComanda">
+                                    <label class="form-check-label" for="checkComanda">
+                                      Comanda
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 px-md-1">
+
+                                <div class="form-floating">
+                                    <select class="form-select" id="tipo" aria-label="Floating label select example" formControlName="tipo">
+                                        <option value="">Seleccionar</option>
+                                        <option value="Cocina">Cocina</option>
+                                        <option value="Bebidas">Bebidas</option>
+                                        <option value="Barra">Barra</option>
+                                    </select>
+                                    <label for="Comanda">Seleccionar</label>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4 px-md-1">
+                            <div class="form-check mt-2">
+                                <input formControlName="visibility" class="form-check-input" type="checkbox" value="" id="checkProducto" checked>
+                                <label class="form-check-label" for="checkProducto">
+                                  Producto Visible
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="text-danger mb-2">
+                                <!-- <p *ngIf="campoValido('name')" class="mb-1 animated fadeIn">- El nombre es obligatorio</p> -->
+                                <!-- <p *ngIf="campoValido('cedula')" class="mb-1 animated fadeIn">- La cedula de ciudadania es obligatoria</p> -->
+                                <!-- <p *ngIf="campoValido('email')" class="mb-1 animated fadeIn">- El email es obligatorio y tiene que ser un email valido</p> -->
+                            </div>
+                        </div>
+
+
+                        <button type="submit" class="btn btnW waves-effect waves-ligth px-3 btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- INFO PRODUCT -->
+
+
+
+    </div>
+
+
+    <!-- LOG DE PRODUCTOS -->
+    <!-- LOG DE PRODUCTOS -->
+    <!-- LOG DE PRODUCTOS -->
+
+    <div class="card mt-5 mb-4">
+        <div class="card-body text-center">
+
+            <h4>Historial del Producto</h4>
+        </div>
+    </div>
+
+    <div class="col-12">
+
+        <div class="d-flex flex-wrap gap-2">
+
+            <div *ngIf="producto" class="col-md-3 p-0 mb-4">
+                <!-- Dashboard info widget 1-->
+                <div class="card border-top-0 border-bottom-0 border-end-0 border-left-lg border-info h-100 bg-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="flex-grow-1">
+                                <div class="small font-weight-bold text-info mb-1">Utilidad</div>
+                                <div class="h5">({{ utilidad | divisa }})</div>
+                            </div>
+                            <div class="ms-2">
+                                <i class="bi bi-currency-dollar text-muted" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="producto" class="col-md-2 p-0 mb-4">
+                <!-- Dashboard info widget 1-->
+                <div class="card border-top-0 border-bottom-0 border-end-0 border-left-lg border-primary h-100 bg-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="flex-grow-1">
+                                <div class="small font-weight-bold text-primary mb-1">Vendidos</div>
+                                <div class="h5">({{ vendidos | number}})</div>
+                            </div>
+                            <div class="ms-2">
+                                <i class="bi bi-arrow-up text-muted" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="producto" class="col-md-2 p-0 mb-4">
+                <!-- Dashboard info widget 1-->
+                <div class="card border-top-0 border-bottom-0 border-end-0 border-left-lg border-success h-100 bg-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="flex-grow-1">
+                                <div class="small font-weight-bold text-success mb-1">Comprados</div>
+                                <div class="h5">({{ comprados | number }})</div>
+                            </div>
+                            <div class="ms-2">
+                                <i class="bi bi-truck text-muted" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="producto" class="col-md-2 p-0 mb-4">
+                <!-- Dashboard info widget 1-->
+                <div class="card border-top-0 border-bottom-0 border-end-0 border-left-lg border-warning h-100 bg-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="flex-grow-1">
+                                <div class="small font-weight-bold text-warning mb-1">Devueltos</div>
+                                <div class="h5">({{ devueltos | number }})</div>
+                            </div>
+                            <div class="ms-2">
+                                <i class="bi bi-arrow-down text-muted" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row mb-5">
+
+            <!-- FILTRO -->
+            <div class="col-12 col-md-3 col-xl-3 mt-2">
+                <div class="p-3 rounded bg-white">
+
+                    <h4 class="mb-0 text-muted">Filtros</h4>
+
+                    <hr>
+                    <div class="mb-3">
+                        <label for="" class="form-label">Tipo</label>
+                        <select class="form-select form-select-lg" name="" id="" (change)="selectType(typeS.value)" #typeS>
+                            <option value="all">Todos</option>
+                            <option value="Salida">Salida</option>
+                            <option value="Agrego">Agrego</option>
+                            <option value="Compra">Compra</option>
+                            <option value="Elimino">Elimino</option>
+                            <option value="Devolución">Devolución</option>
+                        </select>
+                    </div>
+                    
+
+                    <hr>
+
+                    <!-- DESDE -->
+                    <div class="mt-4">
+                        <label class="" for="">Desde</label>
+                        <input type="datetime-local" class="form-control" (change)="initial.value" #initial>
+                    </div>
+                    <!-- DESDE -->
+
+                    <!-- HASTA -->
+                    <div class="mt-2">
+                        <label class="" for="">Hasta</label>
+                        <input type="datetime-local" class="form-control" (change)="end.value" #end>
+                    </div>
+                    <!-- HASTA -->
+
+                    <button (click)="buscarPor(initial.value, end.value)" type="button" class="btn btn-outline-primary btn-sm btn-block mt-4"> 
+                        <i class="bi-search"></i> Buscar 
+                    </button>
+
+                </div>
+            </div>
+            <!-- FILTRO -->
+
+            <!-- TABLE CLIENTS -->
+            <div class="shadow p-3 rounded bg-white col-12 col-md-9 col-xl-9 mt-2">
+
+                <div *ngIf="!cargando">
+
+                    <!-- BTN CREAR CAJA -->
+                    <div class="d-flex justify-content-end">
+
+                        <div class="row">
+                            <div class="col pe-0">Mostrar:</div>
+                            <div class="col">
+                                <select class="form-select form-select-sm" (change)="limiteChange(limit.value)" [value]="query.hasta" aria-label=".form-select-sm example" #limit>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="250">250</option>
+                                    <option value="500">500</option>
+                                    <option value="1000">1000</option>
+                                    <option value="5000">5000</option>
+                                    <option value="10000">10000</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <!-- BTN CREAR CAJA -->
+
+                    <div class="table-responsive ">
+                        <table class="table table-borderless table-striped table-hover table-sm animated fadeIn ">
+                            <thead class="border-bottom ">
+                                <tr>
+                                    <th class="text-muted " scope="col ">#</th>
+                                    <th class="text-muted " scope="col " colspan="2">Codigo</th>
+                                    <th class="text-muted " scope="col " colspan="2">Nombre</th>
+                                    <th class="text-muted text-center" scope="col">Departamento</th>
+                                    <th class="text-muted " scope="col ">Descripción</th>
+                                    <th class="text-muted " scope="col ">Tipo</th>
+                                    <th class="text-muted text-center" scope="col">Antes</th>
+                                    <th class="text-muted text-center" scope="col">Cantidad</th>
+                                    <th class="text-muted text-center" scope="col">Stock</th>
+                                    <th class="text-muted " scope="col ">Usuario</th>
+                                    <th class="text-muted " scope="col ">fecha</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr *ngIf="logs.length === 0" class="text-center ">
+                                    <th colspan="13" class="py-4">
+                                        <h4 class="text-muted">Sin Resultados</h4>
+                                    </th>
+                                </tr>
+
+                                <tr class="trHover" *ngFor="let item of logs; let i = index">
+                                    <th scope="row ">{{ i + 1}}</th>
+                                    <td colspan="2">{{ item.code }}</td>
+                                    <td colspan="2">{{ item.name }}</td>
+                                    <td class="text-center">{{ item.departamento }}</td>
+                                    <td>
+                                        <a *ngIf="item.invoice" [routerLink]="['/dashboard/factura', item.invoice._id]">                   
+                                            {{ item.description }}
+                                        </a>
+                                        <a *ngIf="item.compra" [routerLink]="['/dashboard/compra', item.compra]">                   
+                                            {{ item.description }}
+                                        </a>
+                                        <span *ngIf="!item.invoice && !item.compra">
+                                            {{ item.description }}                                
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="item.type === 'Salida'" class="badge rounded-pill bg-danger text-white-75">{{ item.type }}</span>
+                                        <span *ngIf="item.type === 'Agrego'" class="badge rounded-pill bg-success text-white-75">{{ item.type }}</span>
+                                        <span *ngIf="item.type === 'Compra'" class="badge rounded-pill bg-success text-white-75">{{ item.type }}</span>
+                                        <span *ngIf="item.type === 'Elimino'" class="badge rounded-pill bg-warning text-white-75">{{ item.type }}</span>
+                                        <span *ngIf="item.type === 'Devolución'" class="badge rounded-pill bg-info text-white-75">{{ item.type }}</span>
+                                    </td>
+    
+                                    <td class="text-center">{{ item.befored | number }}</td>
+                                    <td class="text-center">{{ item.qty | number }}</td>
+                                    <td class="text-center">{{ item.stock  | number}}</td>
+                                    <td>{{ item.cajero.name }}</td>
+                                    <td> <small class="text-wrapp"> {{ item.fecha | date:'medium'}}</small></td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <!-- BTN SIGUIENTE Y ANTERIOR -->
+                    <div class="row">
+                        <div class="col col-md-4">
+                            <small class="text-muted">Total de movimientos: ({{total}})</small>
+                        </div>
+
+                        <div class="col d-flex justify-content-end">
+                            <button [disabled]="query.desde === 0" type="button" (click)="cambiarPagina((query.hasta * -1))" class="btn btn-sm btn-dark btnW waves-effect waves-light px-3">Anterior</button>
+                            <button [disabled]="query.hasta  > logs.length || query.hasta > total" type="button" (click)="cambiarPagina(query.hasta)" class="btn btn-sm btn-dark btnW waves-effect waves-light px-3 ms-2">Siguiente</button>
+                        </div>
+                    </div>
+                    <!-- BTN SIGUIENTE Y ANTERIOR -->
+
+                </div>
+            </div>
+            <!-- TABLE CLIENTS -->
+
+        </div>
+
+    </div>
+
+
+</div>
+<!-- =========================================================================
+    BODY 
+========================================================================= -->
+
+<!-- =========================================================================
+    MODAL AJUSTAR INVENTARIO
+========================================================================= -->
+
+<div class="modal fade" id="ajustarInventario" tabindex="-1" aria-labelledby="ajustarInventarioModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ajustarInventarioModal"><i class="bi-arrow-left-right" style="font-size: 1rem"></i> Movimientos </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- NAV - NAV -->
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <a class="nav-link active" id="nav-entradas-tab" data-bs-toggle="tab" href="#nav-entradas" role="tab" aria-controls="nav-entradas" aria-selected="true"><i class="bi-box-arrow-in-right"></i>  Ingresar</a>
+                        <a class="nav-link" id="nav-salidas-tab" data-bs-toggle="tab" href="#nav-salidas" role="tab" aria-controls="nav-salidas" aria-selected="false"><i class="bi-box-arrow-right"></i> Ajustar</a>
+                    </div>
+                </nav>
+                <!-- NAV - NAV -->
+
+                <div class="tab-content" id="nav-tabContent">
+
+                    <!-- ENTRADAS - ENTRADAS - ENTRADAS -->
+                    <div class="tab-pane fade show active" id="nav-entradas" role="tabpanel" aria-labelledby="nav-entradas-tab">
+
+                        <div class="py-4">
+
+                            <div class="form-group">
+                                <label for="">Aumentar</label>
+                                <input type="number" class="form-control" placeholder="Agregue la cantidad de productos nuevos" #cantidadE>
+                            </div>
+
+                            <div class="col py-2">
+                                <button type="button" (click)="ajustar('entrada', cantidadE.value)" class="btn btnW waves-effect waves-ligth px-3 btn-primary">Guardar</button>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <!-- ENTRADAS - ENTRADAS - ENTRADAS -->
+                    <!-- SALIDAS - SALIDAS - SALIDAS -->
+                    <div class="tab-pane fade" id="nav-salidas" role="tabpanel" aria-labelledby="nav-salidas-tab">
+
+                        <div class="py-4">
+
+                            <div class="form-group">
+                                <label for="">Ajuste</label>
+                                <input type="number" class="form-control" placeholder="Registre el ajuste de los productos" #cantidadS>
+                            </div>
+
+                            <div class="col py-2">
+                                <button type="button" (click)="ajustar('salida', cantidadS.value)" class="btn btnW waves-effect waves-ligth px-3 btn-primary">Guardar</button>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <!-- SALIDAS - SALIDAS - SALIDAS -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================================
+    MODAL AJUSTAR INVENTARIO
+========================================================================= -->
