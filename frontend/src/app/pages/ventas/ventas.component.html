@@ -1,0 +1,119 @@
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+<header>
+    <div class="bg-header-blue py-2 px-3 mb-2">
+        <h5 class="text-white m-0">Ventas</h5>
+    </div>
+
+    <ul class="nav nav-tabs px-3">
+        <li class="nav-item">
+          <a (click)="selectPiso('todos')" class="nav-link text-dark active cursor" id="todos-tab"  data-bs-toggle="tab" role="tab" aria-controls="todos" aria-selected="true" >Todos</a>
+        </li>
+        <li class="nav-item" *ngFor="let piso of pisos">
+          <a (click)="selectPiso(piso.piid)" class="nav-link text-dark cursor" id="{{piso.name}}-tab"  data-bs-toggle="tab" role="tab" aria-controls="{{piso.name}}" aria-selected="true"> {{ piso.name }} </a>
+        </li>
+      </ul>
+</header>
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+<!-- =========================================================================
+    BODY 
+========================================================================= -->
+<div class="container-fluid">
+
+    <!-- MESAS -->
+    <div class="p-2 border-bottom my-2">
+        <h4 class="mb-2 text-muted">Tickets</h4>
+
+        <div class="col-md-8 mx-auto">
+            <div class="form-floating mb-2">
+                <span class="position-absolute top-50 start-90 translate-middle"><i class=" bi-search " style="font-size: 1rem "></i></span>
+                <input type="text" class="form-control" id="floatingInput2" placeholder="Buscar" (keyup)="buscar(search.value)" #search>
+                <label for="floatingInput2 ">Buscar</label>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="d-flex flex-wrap">
+
+
+            <ng-container *ngIf="role === 'WAITER'">
+
+                <div *ngFor="let mesa of listaMesas">
+
+                    <div class="p-2" *ngIf="mesa.mesero._id === user && mesa.status">
+                        <button [routerLink]="['/dashboard/ventas/mesa', mesa.mid]" type="button" style="width: 10rem;" class=" text-wrap bg-white p-3 btn btnW waves-effect waves-ligth position-relative"> 
+                            <small *ngIf="!mesa.disponible" class="text-danger"> Ocupada </small>
+                            <small *ngIf="mesa.disponible" class="text-success"> Disponible </small>
+                            <i [ngClass]="{'text-danger': mesa.disponible == false, 'text-success': mesa.disponible == true}" class="bi-dot position-absolute top-0 start-100 translate-middle pe-4 pt-2" style="font-size: 2.5rem;"></i>
+                            <h5 class="mb-0 text-wrap">{{ mesa.name }}</h5>                    
+                            <img src="../../../assets/img/icons/{{ mesa.img || 'ticket.svg' }}" alt="" style="max-height: 100px;">
+                            <h6 class="mb-0 text-wrap fw-normal"> {{ mesa.mesero.name }} </h6>
+                            <hr>
+                            <small *ngIf="!mesa.disponible" class="mb-0 text-muted lh-1">
+                                <span *ngIf="mesa.cliente"> {{ mesa.cliente.name }} </span>
+                                <span *ngIf="mesa.placa"> - {{ mesa.placa }}</span> 
+                                <span *ngIf="!mesa.cliente">Consumidor Final</span>
+                            </small>      
+                        </button>
+                    </div>
+                </div>
+
+            </ng-container>
+
+            <ng-container *ngIf="role !== 'WAITER'">
+
+                <ng-container *ngIf="role === 'CASHIER'">
+
+                    <div *ngFor="let mesa of listaMesas">
+
+                        <div class="p-2" *ngIf="mesa.mesero._id === user && mesa.status">
+                            <button [routerLink]="['/dashboard/ventas/mesa', mesa.mid]" type="button" style="width: 10rem;" class=" text-wrap bg-white p-3 btn btnW waves-effect waves-ligth position-relative"> 
+                                <small *ngIf="!mesa.disponible" class="text-danger"> Ocupada </small>
+                                <small *ngIf="mesa.disponible" class="text-success"> Disponible </small>
+                                <i [ngClass]="{'text-danger': mesa.disponible == false, 'text-success': mesa.disponible == true}" class="bi-dot position-absolute top-0 start-100 translate-middle pe-4 pt-2" style="font-size: 2.5rem;"></i>
+                                <h5 class="mb-0 text-wrap">{{ mesa.name }}</h5>                    
+                                <img src="../../../assets/img/icons/{{ mesa.img || 'ticket.svg' }}" alt="" style="max-height: 80px;">
+                                <h6 class="mb-0 text-wrap fw-normal"> {{ mesa.mesero.name }} </h6>
+                                <hr>
+                                <small *ngIf="!mesa.disponible" class="mb-0 text-muted lh-1"> 
+                                    <span *ngIf="mesa.cliente"> {{ mesa.cliente.name }}</span> 
+                                    <span *ngIf="mesa.placa"> - {{ mesa.placa }}</span> 
+                                </small>                 
+                            </button>
+                        </div>
+                    </div>
+
+                </ng-container>
+
+                <ng-container *ngIf="role !== 'CASHIER'">
+
+                    <div  class="p-2" *ngFor="let mesa of listaMesas">
+                        <button *ngIf="mesa.status" [routerLink]="['/dashboard/ventas/mesa', mesa.mid]" type="button" style="width: 10rem;" class=" text-wrap bg-white text-wrap p-3 btn btnW waves-effect waves-ligth position-relative"> 
+                            <small *ngIf="!mesa.disponible" class="text-danger"> Ocupada </small>
+                            <small *ngIf="mesa.disponible" class="text-success"> Disponible </small>
+                            <i [ngClass]="{'text-danger': mesa.disponible == false, 'text-success': mesa.disponible == true}" class="bi-dot position-absolute top-0 start-100 translate-middle pe-4 pt-2" style="font-size: 2.5rem;"></i>
+                            <h5 class="mb-0 text-wrap">{{ mesa.name }}</h5>                    
+                            <img src="../../../assets/img/icons/{{ mesa.img || 'ticket.svg' }}" alt="" style="max-height: 100px;">
+                            <h6 *ngIf="mesa.mesero" class="mb-0 text-wrap fw-normal"> {{ mesa.mesero.name }} </h6>
+                            <hr *ngIf="!mesa.disponible" class="mb-2">
+                            <span *ngIf="mesa.cliente"> {{ mesa.cliente.name }}</span> 
+                            <span *ngIf="mesa.placa"> - {{ mesa.placa }}</span>                 
+                        </button>
+                    </div>
+
+                </ng-container>
+
+            </ng-container>
+
+        </div>
+    </div>
+    <!-- MESAS -->
+
+</div>
+<!-- =========================================================================
+    BODY 
+========================================================================= -->
