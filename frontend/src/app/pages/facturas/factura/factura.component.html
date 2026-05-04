@@ -1,0 +1,771 @@
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+
+<header>
+    <div class="bg-header-blue py-2 px-3 mb-2">
+        <h5 class="text-white m-0">Facturas</h5>
+    </div>
+
+    <ul class="nav nav-tabs px-3" id="myTab" role="tablist">
+
+        <li class="nav-item" role="presentation">
+            <a class="nav-link text-dark active" id="facturas-tab"><i class="bi-journal-check" style="font-size: 1rem"></i> Factura <span *ngIf="factura"> #{{factura.invoice}} </span> </a>
+        </li>
+
+    </ul>
+
+</header>
+
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+<div class="container-fluid">
+
+
+    <ng-container *ngIf="factura">
+        <!-- TITLE - SUBTITLE -->
+        <div class="mt-4">
+            <h5 class="text-dark">DETALLES DE LA FACTURA #{{ factura.invoice }}</h5>
+            <p class="mb-0">Cajero: {{ factura.user.name }}</p>
+
+        </div>
+        <!-- TITLE - SUBTITLE -->
+
+        <div>
+
+            <ng-container *ngIf="empresa">
+                <button *ngIf="empresa.printpos" [routerLink]="['/dashboard/ventas/print', factura.iid]" type="button" class="btn btn-outline-primary btn-sm mx-1 my-2"> 
+                    <i class="bi-printer"></i> Imprimir
+                </button>
+
+                <button *ngIf="!empresa.printpos" (click)="printDiv('printDiv')" type="button" class="btn btn-outline-primary btn-sm mx-1 my-2"> 
+                    <i class="bi-printer"></i> Imprimir
+                </button>
+            </ng-container>
+
+            <button (click)="devolucion(factura.iid)" [disabled]="user.role !== 'ADMIN'" type="button" class="btn btn-outline-danger btn-sm mx-1 my-2"> 
+                <i class="bi-arrow-counterclockwise"></i> Cancelar Factura
+            </button>
+
+            <button *ngIf="factura.credito" [disabled]="user.cerrada" (click)="focusMonto()" type="button" class="btn btn-outline-dark btn-sm mx-1 my-2" data-bs-toggle="modal" data-bs-target="#facturar"> 
+                Cobrar
+            </button>
+
+            <button *ngIf="factura.pedido" type="button" class="btn btn-outline-info btn-sm mx-1 my-2" [routerLink]="['/dashboard/pedido', factura.pedido]"> 
+                Ver pedido
+            </button>
+
+            <a type="button" class="btn btn-danger btn-sm mx-1 my-2" [href]="pdfLink" target="_blank"> 
+                PDF
+            </a>
+
+            <button type="button" class="btn btn-info btn-sm mx-1 my-2" data-bs-toggle="modal" data-bs-target="#editVencimiento"> 
+                Editar Fecha
+            </button>
+
+            <button type="button" class="btn btn-secondary btn-sm mx-1 my-2" data-bs-toggle="modal" data-bs-target="#editControl"> 
+                Editar Control
+            </button>
+
+            <button [disabled]="enviando" (click)="sendInvoice()" *ngIf="factura.electronica && !factura.send || user.role === 'ADMIN' && !factura.send " type="button" class="btn btn-warning btn-sm mx-1 my-2"> 
+                <span *ngIf="!enviando">Enviar Factura DIAN</span>
+                <span *ngIf="enviando">Enviando...</span>                
+            </button>
+
+            <a *ngIf="factura.pdf_url" [href]="factura.pdf_url" target="_blank" class="btn btn-outline-danger btn-sm mx-1 my-2">
+                <i class="bi bi-file-pdf"></i> Factura Electronica
+            </a>
+
+            <ng-container *ngIf="empresa">
+                <button *ngIf="empresa.taller" type="button" class="btn btn-primary btn-sm mx-1 my-2" data-bs-toggle="modal" data-bs-target="#imgUp"> 
+                    Imagenes
+                </button>
+            </ng-container>
+        </div>
+
+        <div class="row">
+
+            <!-- DETALLES DE LA FACTURA -->
+            <div class="col-md-8 shadow-lg p-3 mb-5 rounded bg-white">
+
+                <div id="printDiv">
+
+                    <!-- SI ES A CREDITO -->
+                    <span *ngIf="factura.credito" class="badge rounded-pill bg-warning text-dark mb-2">A Credito <span *ngIf="factura.apartado">- Apartado </span> </span>
+
+                    <!-- INFORMACION DEL CLIENTE -->
+                    <div class="row">
+
+                        <!-- Informacion del Cliente -->
+                        <div class="col-md-8 text-left text-muted" style="color:black">
+
+                            <div class="d-flex flex-wrap gap-1">
+
+                                <div *ngIf="empresa">
+                                    <!-- Image Product-->
+                                    <img *ngIf="empresa.logo" [src]=" empresa.logo | imagen:'logo'" class="mx-auto" width="120px" alt="">
+                                </div>
+
+                                <div>
+                                    <p style="font-size: 0.9rem;" class="mb-0 text-dark"> <strong>RAZON SOCIAL:</strong> <small> {{ factura.client?.name || 'Consumidor Final' }}</small> </p>
+
+                                    <p style="font-size: 0.9rem;" class="mb-0 text-dark"> <strong>CC/NIT:</strong> <small> {{ factura.client?.cedula || '222222222222' }}</small> </p>
+
+                                    <p style="font-size: 0.9rem;" *ngIf="factura.client?.phone" class="mb-0 text-dark"> <strong>Telefono:</strong> <small> {{ factura.client?.phone || '--- --------' }}</small> </p>
+
+                                    <p style="font-size: 0.9rem;" *ngIf="factura.client?.email" class="mb-0 text-dark"> <strong>Correo:</strong> <small> {{ factura.client?.email || ''}}</small> </p>
+
+                                    <p style="font-size: 0.9rem;" *ngIf="factura.client?.address" class="mb-0 text-dark"> <strong>Dirección:</strong> <small> {{ factura.client?.address || ''}}</small> </p>
+
+                                    <p style="font-size: 0.9rem;" class="mb-0 text-dark"> <strong>Vendedor:</strong> <small> {{ factura.mesero?.name || ''}}</small> </p>
+                                    <p *ngIf="factura.placa" style="font-size: 0.9rem;" class="mb-0 text-dark"> <strong>Placa:</strong> <small> {{ factura.placa || ''}}</small> </p>
+
+                                </div>
+                            </div>
+
+                            <!-- CUFE Y QR -->
+                            <div class="d-flex flex-wrap" *ngIf="factura.cufe">
+                                <div class="qrcodeImage">
+                                    <qrcode [qrdata]="'https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey='+factura.cufe" [allowEmptyString]="true" [alt]="'A custom alt attribute'" [ariaLabel]="'QR Code image with the following content...'" [cssClass]="'center'" [colorDark]="'#000'"
+                                        [colorLight]="'#ffffffff'" [elementType]="'img'" [errorCorrectionLevel]="'M'" [margin]="3" [scale]="1" [title]="'A custom title attribute'" [width]="80"></qrcode>
+                                </div>
+                                <div class="text-wrap">
+                                    <p style="font-size: 0.8rem;" class="mb-1 text-dark text-break"> <strong>CUFE:</strong> <small>{{ factura.cufe }}</small> </p>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="col">
+                            <div class="col-12" *ngIf="empresa">
+                                <!-- <div class="mb-2 d-flex justify-content-end">
+                                <img *ngIf="empresa.logo" src="{{empresa.logo | imagen:'logo'}}" class="" width="200px" alt="">
+                            </div> -->
+                                <h6 class="mb-0 d-flex justify-content-end text-wrap text-end fw-bold"> {{ empresa.name }} </h6>
+                                <p class="mb-0 d-flex justify-content-end text-wrap text-end" *ngFor="let text of ticketHeader" style="line-height: 1rem; font-size: 0.8rem;"> {{ text }} </p>
+
+                                <p class="mb-0 mt-2 d-flex justify-content-end text-wrap text-end"> {{empresa.type}}: </p>
+                                <h6 class="mb-0 d-flex justify-content-end text-primary fw-normal">
+                                    <span *ngIf="factura.cufe"> {{ factura.number }} </span>
+                                    <span *ngIf="!factura.cufe">{{ factura.invoice }} </span>
+
+                                </h6>
+                                <small class="mb-0 d-flex justify-content-end">Control: {{ factura.control || 0 }} </small>
+                                <small class="mb-0 d-flex justify-content-end"> {{ factura.fecha | date:'medium' }} </small>
+                                <small *ngIf="factura.credito" class="mb-0 d-flex justify-content-end">Vence: {{ factura.fechaCredito | date:'shortDate' }} </small>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- INFORMACION DEL CLIENTE -->
+
+                    <!-- INFORMACION DE LA FACTURA -->
+                    <ng-container *ngIf="empresa">
+                        <h4 *ngIf="!empresa.responsable" class="text-center text-wrap"> Factura de venta pos </h4>
+                        <h4 *ngIf="empresa.responsable" class="text-center text-wrap"> Factura de venta pos </h4>
+                        <h4 *ngIf="!factura.status" class="text-center text-danger"> CANCELADA </h4>
+                    </ng-container>
+
+                    <div class=" table-responsive ">
+
+                        <table class="table table-borderless table-striped table-sm " [ngClass]=" {'tabla-con-marca': factura.marca && !factura.credito}">
+                            <thead class="border-bottom">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Codigo de barras</th>
+                                    <th class=" text-left" scope="col " colspan="2 ">Nombre del Producto</th>
+                                    <th scope="col">tipo</th>
+                                    <th scope="col">Precio</th>
+                                    <th scope="col">Cantidad</th>
+                                    <th scope="col">Monto</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-dark">
+
+                                <tr *ngFor="let producto of factura.products; let i = index">
+                                    <th> {{ i + 1 }} </th>
+                                    <td><small class="text-wrap">{{ producto.product.code }}</small></td>
+                                    <td colspan="2">{{ producto.product.name }} <strong *ngIf="producto.mayor">M</strong> </td>
+                                    <td>{{ producto.product.type }}</td>
+                                    <td>{{ producto.price | divisa}}</td>
+                                    <td class="text-center">{{ producto.qty }}</td>
+                                    <td>{{ producto.price * producto.qty | divisa}}</td>
+                                    <td>
+                                        <button type="button" [disabled]="user.cerrada || user.role === 'CASHIER'" class="btn btn-link p-1 text-warning" (click)="devolverProducto(producto)">
+                                        <i class="bi-arrow-90deg-left"></i>
+                                    </button>
+                                        <button type="button" [disabled]="user.cerrada || user.role === 'CASHIER'" (click)="eliminarProducto(producto._id)" class="btn btn-link p-1 text-danger">
+                                        <i class="bi-x"></i>
+                                    </button>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="7">ITEMS</th>
+                                    <th> {{ factura.totalItems || 0 | number}} </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+
+                    <!-- TOTAL -->
+                    <div>
+                        <div class="d-flex py-2">
+
+                            <div class="text-wrap px-2">
+                                <h6 *ngIf="factura.nota">Nota:</h6>
+                                <p *ngIf="factura.nota"> {{ factura.nota }} </p>
+                            </div>
+
+                            <div class="ms-auto d-flex justify-content-end">
+                                <div class="border-start col px-4" *ngIf="empresa">
+
+                                    <!-- NO RESPONSABLE -->
+                                    <h6 class="mb-0 text-wrap text-primary text-rigth" *ngIf="!empresa.responsable"> {{ factura.base | divisa }} </h6>
+                                    <h6 class="mb-0 text-wrap text-primary text-rigth" *ngIf="empresa.responsable"> {{ factura.base | divisa }} </h6>
+                                    <!-- NO RESPONSABLE -->
+
+                                    <!-- DESCUENTO -->
+                                    <h6 *ngIf="factura?.descuento" class="mb-0 text-wrap text-primary text-left">Descuento {{ (factura.base * factura.porcentaje) /100 | divisa }} </h6>
+                                    <!-- DESCUENTO -->
+
+                                    <h6 *ngIf="!empresa.impuesto" class="mb-0 text-wrap text-primary text-left">No responsable de IVA</h6>
+
+                                    <!-- IMPUESTO -->
+                                    <ng-container *ngIf="empresa.impuesto">
+                                        <ng-container *ngFor="let impuesto of impuestos">
+                                            <h6 class="mb-0 text-wrap text-primary text-left" *ngIf="impuesto.total > 0">{{impuesto.name}} {{ impuesto.total | divisa }}</h6>
+                                        </ng-container>
+                                    </ng-container>
+                                    <!-- IMPUESTO -->
+
+                                    <!-- TOTAL -->
+                                    <h5 class="display-6 fw-bold text-primary">{{ factura.amount | divisa }}</h5>
+                                    <!-- TOTAL -->
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- TOTAL -->
+
+                </div>
+
+                <!-- INFORMACION DE LA FACTURA -->
+
+            </div>
+            <!-- DETALLES DE LA FACTURA -->
+
+            <!-- PAGOS -->
+            <div class="col-md-4">
+
+                <!-- TABLE PAGOS-->
+                <div class="shadow-lg p-3 mb-5 rounded bg-white">
+                    <div class="d-flex justify-content-center">
+                        <div id="printPagos" style="color: #000;" [ngStyle]="{'max-width': empresa.impresora === 58 ? '16rem' : '24rem'}">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="">
+                                    Pagos
+                                </h5>
+                                <h5 class="">
+                                    #{{ factura.invoice }}
+                                </h5>
+                            </div>
+                            <!-- CARGANDO -->
+                            <div *ngIf="cargandoAgotados">
+                                <div class="text-center p-4">
+                                    <div class="spinner-grow text-secondary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted">cargando...</small>
+                            </div>
+                            <!-- CARGANDO -->
+
+                            <div *ngIf="!cargandoAgotados">
+
+                                <div class="table-responsive " class="overflow-auto">
+                                    <table class="table table-borderless table-hover table-sm animated fadeIn ">
+                                        <thead class="border-bottom ">
+                                            <tr style="color: #000;">
+                                                <th scope="col">Descripcion</th>
+                                                <th scope="col">Tipo</th>
+                                                <th scope="col">Monto</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                            <tr style="color: #000;">
+                                                <td class="fw-bold">
+                                                    Total de la factura
+                                                </td>
+                                                <td class="fw-normal">
+                                                    --
+                                                </td>
+                                                <td class="fw-bold"> {{ factura.amount + factura.tip || 0 | divisa }} </td>
+                                            </tr>
+
+                                            <tr class="trHover" *ngFor="let payA of factura.paymentsAlquiler; let i = index">
+                                                <td class="fw-normal">
+                                                    <span *ngIf="payA.description !== ''">{{ payA.description }}</span>
+                                                    <span *ngIf="payA.description === ''">Sin descripción</span>
+                                                </td>
+                                                <td class="fw-normal">{{ payA.type }}</td>
+                                                <td class="fw-normal">{{ payA.amount | divisa }} </td>
+                                            </tr>
+
+                                            <tr class="trHover" *ngFor="let pay of payments; let i = index" style="color: #000;">
+                                                <td class="fw-normal">
+                                                    <span *ngIf="pay.description !== ''">{{ pay.description }} </span>
+                                                    <span *ngIf="pay.description === ''">Sin descripción</span>
+                                                </td>
+                                                <td class="fw-normal">{{ pay.type }}</td>
+                                                <td class="fw-normal">{{ pay.amount | divisa }} </td>
+                                            </tr>
+
+                                            <tr class="trHover" *ngFor="let pay of paymentsCredit; let i = index" style="color: #000;">
+                                                <td class="fw-normal">
+                                                    <span *ngIf="pay.description !== ''">{{ pay.description }} {{ pay.fecha | date: 'short' }} </span>
+                                                    <span *ngIf="pay.description === ''">Sin descripción {{ pay.fecha | date: 'short' }}</span>
+                                                </td>
+                                                <td class="fw-normal">{{ pay.type }}</td>
+                                                <td class="fw-normal">{{ pay.amount | divisa }} </td>
+                                            </tr>
+
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="border-top" style="color: #000;">
+                                                <td colspan="2"> <span class="fw-bold"> Restante </span></td>
+                                                <td> <span class="fw-bold">{{ ( (factura.amount + factura.tip || 0) - totalPagos) | divisa }}</span> </td>
+                                            </tr>
+                                        </tfoot>
+
+                                    </table>
+
+                                </div>
+
+                                <!-- BTN SIGUIENTE Y ANTERIOR -->
+                                <div class="row">
+                                    <div class="col" style="color: #000;">
+                                        <small>Total de pagos: ({{payments.length + paymentsCredit.length}})</small>
+                                    </div>
+                                </div>
+                                <!-- BTN SIGUIENTE Y ANTERIOR -->
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <button (click)="printDiv('printPagos')" type="button" class="btn btn-outline-primary btn-sm w-100"> 
+                        <i class="bi-printer"></i> Imprimir
+                    </button>
+                </div>
+                <!-- TABLE PAGOS-->
+
+                <!-- TABLE DEVOLUCION-->
+                <div class="shadow-lg p-3 mb-5 rounded bg-white" style="max-height: 400px; height: auto;">
+                    <h5 class="">
+                        Devoluciones
+                    </h5>
+                    <!-- CARGANDO -->
+                    <div *ngIf="cargandoAgotados">
+                        <div class="text-center p-4">
+                            <div class="spinner-grow text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <small class="text-muted">cargando...</small>
+                    </div>
+                    <!-- CARGANDO -->
+
+                    <div *ngIf="!cargandoAgotados" style="max-height: 100vh">
+
+                        <div class="table-responsive " class="overflow-auto" style="max-height: 200px;">
+                            <table class="table table-borderless table-striped table-hover table-sm animated fadeIn ">
+                                <thead class="border-bottom ">
+                                    <tr>
+                                        <th class="text-muted " scope="col " colspan="2">Codigo</th>
+                                        <th class="text-muted " scope="col ">Cantidad</th>
+                                        <th class="text-muted " scope="col ">Precio</th>
+                                        <th class="text-muted " scope="col ">Monto</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    <tr *ngIf="factura.devolucion.length === 0">
+                                        <td colspan="5">No existen devoluciones...</td>
+                                    </tr>
+
+                                    <tr class="trHover" *ngFor="let devolucion of factura.devolucion; let i = index">
+                                        <td colspan="2">
+                                            {{ devolucion.product.code }}
+                                        </td>
+                                        <td class="text-center">{{ devolucion.qty }}</td>
+                                        <td>{{ devolucion.price | divisa }} </td>
+                                        <td>{{ devolucion.monto | divisa }} </td>
+                                    </tr>
+
+                                </tbody>
+                                <tfoot>
+                                    <tr class="border-top">
+                                        <td colspan="2"> <span class="fw-bold"> Total  </span></td>
+                                        <td> <span class="fw-bold">{{ totalDevolucion | divisa }}</span> </td>
+                                    </tr>
+                                </tfoot>
+
+                            </table>
+
+                        </div>
+
+                        <!-- BTN SIGUIENTE Y ANTERIOR -->
+                        <div class="row">
+                            <div class="col">
+                                <small class="text-muted">Total de pagos: ({{payments.length + paymentsCredit.length}})</small>
+                            </div>
+                        </div>
+                        <!-- BTN SIGUIENTE Y ANTERIOR -->
+
+                    </div>
+                </div>
+                <!-- TABLE DEVOLUCION-->
+
+            </div>
+            <!-- PAGOS -->
+
+        </div>
+
+    </ng-container>
+
+
+
+</div>
+<!-- =========================================================================
+    BODY 
+========================================================================= -->
+
+<!-- =========================================================================
+    MODAL FACTURAR 
+========================================================================= -->
+<div class="modal fade" id="facturar" tabindex="-1" aria-labelledby="facturarModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body p-0">
+
+                <div class="container-fluid">
+                    <div class="py-2">
+
+                        <!-- COLUMNA IZQ -->
+                        <div class="col px-0 bg-white">
+
+                            <!-- TITULO -->
+                            <div class="bg-header-blue py-1 px-2">
+                                <h4 class="text-white fw-normal mb-0">Cobrar</h4>
+                            </div>
+
+                            <div class="container-fluid py-4">
+
+                                <!-- TOTAL -->
+                                <div class="text-center my-3">
+                                    <ng-container *ngIf="factura">
+                                        <h4 class="display-4 text-primary">{{ factura.amount | divisa }}</h4>
+                                    </ng-container>
+
+
+                                    <small *ngIf="totalPagos > 0 && totalPagos < factura.amount" class="text-danger animated fadeIn">Resta</small>
+                                    <small *ngIf="totalPagos > 0 && totalPagos >= factura.amount" class="text-success animated fadeIn">Vueltos</small>
+                                    <h4 class="mb-0 fw-normal animated fadeIn" [ngClass]=" {   'text-danger': totalPagos < factura.amount, 
+                                                        'text-success': totalPagos >= factura.amount
+                                                    }" *ngIf="totalPagos > 0">
+                                        {{ vueltos | divisa }}
+                                    </h4>
+
+                                </div>
+                                <!-- TOTAL -->
+
+
+                                <div class="d-flex justify-content-center">
+
+                                    <div>
+
+                                        <!-- FORM INVOICE - FORM INVOICE -->
+                                        <form autocomplete="off" [formGroup]="invoiceForm">
+
+                                            <div class="row text-center">
+                                                <div class="col p-2">
+
+                                                    <input type="radio" (click)="limpiarPagos()" class="btn-check" name="type" formControlName="type" id="efectivo-outlined" value="efectivo" autocomplete="off" checked>
+                                                    <label class="btn btn-outline-success" for="efectivo-outlined">
+                                                    <i class="px-3 bi-cash-stack" style="font-size: 1.5rem;"></i>
+                                                    <p class="mb-0">Efectivo</p>
+    
+                                                </label>
+
+                                                </div>
+
+                                                <div class="col p-2">
+
+                                                    <input type="radio" (click)="limpiarPagos()" class="btn-check" name="type" formControlName="type" id="transferencia-outlined" value="transferencia" autocomplete="off">
+                                                    <label class="btn btn-outline-info" for="transferencia-outlined">
+                                                        <i class="px-3 bi-credit-card" style="font-size: 1.5rem;"></i>
+                                                        <p class="mb-0">Bancos</p>
+                                                    </label>
+
+                                                </div>
+
+                                                <div class="col p-2">
+                                                    <input type="radio" (click)="limpiarPagos()" class="btn-check" name="options-outlined" name="type" formControlName="type" id="mixto-outlined" value="mixto" autocomplete="off">
+                                                    <label class="btn btn-outline-dark" for="mixto-outlined">
+                                                    <i class="px-3 bi-patch-question" style="font-size: 1.5rem;"></i>
+                                                    <p class="mb-0">Mixto</p>
+                                                    </label>
+                                                </div>
+
+                                                <div class="col p-2">
+                                                    <input type="radio" (click)="limpiarPagos('credito')" #tcredito class="btn-check" name="options-outlined" name="type" formControlName="type" id="credito-outlined" value="credito" autocomplete="off">
+                                                    <label class="btn btn-outline-warning" for="credito-outlined">
+                                                    <i class="px-3 bi-clock-history" style="font-size: 1.5rem;"></i>
+                                                    <p class="mb-0">Abono</p>
+                                                    </label>
+                                                </div>
+
+
+
+                                            </div>
+
+                                            <div class="mx-auto">
+
+                                                <!-- TABLA -->
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-borderless">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Descripcion</th>
+                                                                <th>Monto</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                            <tr class="trHover" *ngFor="let control of payments; let i = index">
+                                                                <th>{{ i + 1}}</th>
+                                                                <td>
+                                                                    <p class="mb-0">{{ control.type }} <span *ngIf="control.description">- {{ control.description }}</span></p>
+                                                                </td>
+                                                                <td> {{ control.amount | divisa }} </td>
+                                                                <td>
+                                                                    <button type="button" class="btn btn-link p-1 text-danger text-right" (click)="eliminarPagos(control)"> <i class="bi-trash"></i> </button>
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr class="trHover" *ngFor="let control of paymentsCredit; let i = index">
+                                                                <th>{{ i + 1}}</th>
+                                                                <td>
+                                                                    <p class="mb-0">{{ control.type }} <span *ngIf="control.description">- {{ control.description }}</span></p>
+                                                                </td>
+                                                                <td> {{ control.amount | divisa }} </td>
+                                                                <td>
+                                                                    <button type="button" class="btn btn-link p-1 text-danger text-right" (click)="eliminarPagos(control)"> <i class="bi-trash"></i> </button>
+                                                                </td>
+                                                            </tr>
+
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                                <!-- TABLA -->
+
+                                                <!-- AGREGAR METODO DE PAGO -->
+                                                <div class="row g-3 d-flex justify-content-center">
+
+                                                    <div class="col-auto">
+
+                                                        <select class="form-select" aria-label="Default select example" (change)="typeAdd.value" #typeAdd>
+                                                            <option *ngIf="invoiceForm.value.type === 'efectivo' || invoiceForm.value.type === 'mixto' || invoiceForm.value.type === 'credito'" value="efectivo">Efectivo</option>
+                                                            <ng-container *ngIf="invoiceForm.value.type !== 'efectivo'">
+                                                                <option *ngFor="let banco of bancos" [value]="banco.name"> {{banco.name}}</option>                                                                
+                                                            </ng-container>
+                                                        </select>
+
+                                                    </div>
+
+                                                    <div class="col-auto">
+                                                        <label for="Descripción" class="visually-hidden">Descripción</label>
+                                                        <input type="text" class="form-control w100" id="Descripción" placeholder="Descripción" (keyup)="descripcionAdd.value" #descripcionAdd>
+                                                    </div>
+
+                                                    <div class="col-auto">
+                                                        <label for="monto" class="visually-hidden">Monto</label>
+
+                                                        <ng-container *ngIf="factura">
+                                                            <input type="number" class="form-control" id="monto" placeholder="Monto" [value]=" vueltos " autofocus="true" (keyup)="montoAdd.value" #montoAdd>
+                                                        </ng-container>
+
+                                                    </div>
+
+                                                    <div class="col-auto">
+                                                        <button type="button" class="btn btn-primary mb-3" (click)="agregarPagos(typeAdd.value, montoAdd.nativeElement.value, descripcionAdd.value, tcredito.checked)">Agregar</button>
+                                                    </div>
+
+                                                </div>
+                                                <!-- AGREGAR METODO DE PAGO -->
+
+                                            </div>
+
+
+                                        </form>
+                                        <!-- FORM INVOICE - FORM INVOICE -->
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <!-- COLUMNA IZQ -->
+
+                    </div>
+
+                    <!-- BTN CREAR FACTURA -->
+                    <div class="my-4 float-end">
+                        <button type="button" (click)="guardarPago()" class="btn btn-outline-primary">
+
+                                    Guardar
+                        </button>
+                    </div>
+                    <!-- BTN CREAR FACTURA -->
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================================
+    MODAL FACTURAR 
+========================================================================= -->
+
+<!-- =========================================================================
+    MODAL EDITAR VENCIMIENTO
+========================================================================= -->
+<div class="modal fade" id="editVencimiento" tabindex="-1" aria-labelledby="editVencimientoModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cambiar fecha de vencimiento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+
+                <div class="container-fluid">
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Seleccionar fecha nueva</label>
+                        <input type="datetime-local" class="form-control" id="exampleFormControlInput1" #newVencimiento>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button (click)="actualizarVencimiento(newVencimiento.value)" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Actualizar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+    MODAL EDITAR VENCIMIENTO 
+========================================================================= -->
+
+<!-- =========================================================================
+    MODAL EDITAR CONTROL
+========================================================================= -->
+<div *ngIf="factura" class="modal fade" id="editControl" tabindex="-1" aria-labelledby="editControlModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Control</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+
+                <div class="container-fluid">
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1Control" class="form-label"># Control</label>
+                        <input [value]="factura.control || 0" type="number" class="form-control" id="exampleFormControlInput1Control" #newControl>
+                        <small>**Solo numeros</small>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button (click)="updateControl(newControl.value)" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Actualizar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+    MODAL EDITAR CONTROL 
+========================================================================= -->
+<!-- =========================================================================
+UO IMGS
+========================================================================= -->
+<div class="modal fade" id="imgUp" tabindex="-1" aria-labelledby="imgUp" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imgUp">
+                    <i class="bi-reciept" style="font-size: 1rem"></i> Imagenes </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div *ngIf="factura" class="card">
+
+                    <div class="card-body">
+
+                        <div>
+                            <h4>Imagenes</h4>
+                            <p *ngIf="factura.images.length === 0">No se han cargado las imagenes</p>
+                        </div>
+
+                        <!-- IMGS -->
+                        <div *ngIf="factura.images.length > 0" class="mt-4 d-flex flex-wrap gap-2">
+
+                            <div *ngFor="let file of factura.images">
+                                <div style="background-image: url('{{ file.img | imagen }}');width: 150px; height: 150px; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+
+                                </div>
+                                <small class="gallery-item-caption"> {{ file.date | date:'medium' }} </small>
+                                <!-- <div class="w-100 text-danger">
+                                    <a class="text-decoration-none text-danger cursor fs-sm" (click)="deleImg(file.img)">
+                                        <i class="ti ti-trash"></i> Eliminar
+                                    </a>
+                                </div> -->
+                            </div>
+
+                        </div>
+                        <!-- IMGS -->
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
