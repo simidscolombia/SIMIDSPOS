@@ -1,0 +1,368 @@
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+<header>
+    <div class="bg-header-blue py-2 px-3 mb-2">
+        <h5 class="text-white m-0">Alquileres</h5>
+    </div>
+    <ul class="nav nav-tabs px-3" id="myTab" role="tablist">
+
+        <li class="nav-item" role="presentation">
+            <a class="nav-link text-dark active" id="ticket1-tab"><i class="bi-gear" style="font-size: 1rem"></i> Tablero Principal</a>
+        </li>
+
+    </ul>
+</header>
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+
+<div class="container-fluid my-4">
+
+    <div class="d-flex flex-wrap gap-3">
+        <!-- BUSCADOR DE CLIENTES  -->
+        <div class="col-md-3 col-auto">
+            <div class="shadow-lg p-3 rounded bg-white">
+                <div class="mb-3">
+                    <h4 class="text-muted">Buscar Cliente</h4>
+                    <div>
+                        <input type="text" class="form-control" placeholder="buscar cliente" (keyup)="buscarClient(searchCl.value)" #searchCl>
+                    </div>
+
+                    <hr>
+
+                    <div *ngIf="clients.length > 0" class="bg-white py-3 px-2 shadow" style="position: absolute; z-index: 1020;">
+
+                        <div *ngIf="cargandoCliente" class="text-center py-3">
+                            <div class="spinner-grow text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div>
+                                <small class="text-muted">Cargando...</small>
+                            </div>
+                        </div>
+
+                        <ul *ngIf="!cargandoCliente" class="list-group list-group-flush overflow-auto" style="max-height: 200px; min-width: 250px;">
+
+                            <li class="list-group-item">
+                                <h6>Resultados: ({{ clients.length }})</h6>
+                            </li>
+
+                            <li class="list-group-item" *ngFor="let item of clients">
+                                <button (click)="buscarAlquilerClient(item.cid)" type="button" style="background: none; border: 0;">
+                                    <div class="d-flex ">
+                                        <div class="align-self-center">
+                                            <span class="text-capitalize fw-bold"> {{ item.name }} </span><br>
+                                            <small> C.C: {{ item.cedula }} </small>
+                                        </div>
+        
+                                        <div class="ms-auto">
+                                            <i class="text-success bi-arrow-90deg-right"></i>
+                                        </div>
+                                    </div>
+                                </button>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- BUSCADOR DE CLIENTES  -->
+
+        <!-- TABLE ALQUILERES -->
+        <div class="shadow-lg p-3 mb-5 rounded bg-white  col-auto">
+
+            <!-- CARGANDO -->
+            <div *ngIf="cargando">
+                <div class="text-center p-4">
+                    <div class="spinner-grow text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <small class="text-muted">cargando...</small>
+            </div>
+            <!-- CARGANDO -->
+
+            <div *ngIf="!cargando">
+
+                <!-- BTN CREAR IMPUESTO -->
+                <div class="d-flex justify-content-between">
+                    <button (click)="query = {desde: 0, hasta: 0}; cargarAlquileres()" type="button" class="btn btn-sm btn-success btnW waves-effect waves-ligth">Limpiar</button>
+                    <button type="button" class="btn btn-sm btn-primary btnW waves-effect waves-ligth" data-bs-toggle="modal" data-bs-target="#nuevoAlquiler">Crear</button>
+                </div>
+                <!-- BTN CREAR IMPUESTO -->
+
+                <div class="table-responsive ">
+                    <table class="table table-borderless table-striped table-hover table-sm animated fadeIn ">
+                        <thead class="border-bottom ">
+                            <tr>
+                                <th class="text-muted " scope="col ">#</th>
+                                <th class="text-muted " scope="col ">Cliente</th>
+                                <th class="text-muted " scope="col ">Entrega</th>
+                                <th class="text-muted " scope="col ">Fecha</th>
+                                <th class="text-muted " scope="col ">Estado</th>
+                                <th class="text-muted w100 " scope="col ">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="alquileres.length === 0" class="text-center ">
+                                <th colspan="10" class="py-4">
+                                    <h4 class="text-muted">Sin Resultados</h4>
+                                </th>
+                            </tr>
+
+                            <tr class="trHover" *ngFor="let alquiler of alquileres; let i = index">
+                                <td>{{ alquiler.number }}</td>
+                                <td>{{ alquiler.client.name }}</td>
+                                <td>
+                                    <span class="badge bg-success" *ngIf="alquiler.finalizada">Finalizada</span>
+                                    <span class="badge bg-warning" *ngIf="!alquiler.finalizada">Pendiente</span>
+                                </td>
+                                <td>{{ alquiler.fecha | date:'short' }}</td>
+                                <td>
+                                    <button *ngIf="alquiler.status" (click)="statusUpdate(alquiler)" type="button" class="btn btnW waves-effect waves-ligth btn-success btn-sm">Activo</button>
+                                    <button *ngIf="!alquiler.status" (click)="statusUpdate(alquiler)" type="button" class="btn btnW waves-effect waves-ligth btn-danger btn-sm">Desactivo</button>
+                                </td>
+                                <td class="text-center">
+                                    <a [routerLink]="['/dashboard/alquiler', alquiler.alid]" class="btn btn-link p-1 text-primary">
+                                        <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- BTN SIGUIENTE Y ANTERIOR -->
+                <div class="row">
+                    <div class="col col-md-4">
+                        <small class="text-muted">Total de Alquileres: ({{total}})</small>
+                        <small *ngIf="resultado !== 0" class="text-muted"> - (Resultados: {{ alquileres.length }})</small>
+                        <small *ngIf="desde !== 0" class="text-muted"> - (Desde el: {{ query.desde + 1}} Hasta el: {{ query.desde + alquileres.length }})</small>
+                    </div>
+
+                    <div class="col d-flex justify-content-end">
+                        <button type="button" (click)=" query.desde = query.desde - query.hasta; cargarAlquileres() " [disabled]="query.desde == 0" class="btn btn-sm btn-dark btnW waves-effect waves-light px-3">Anterior</button>
+                        <button type="button" (click)="query.desde = query.desde + query.hasta; cargarAlquileres()" [disabled]="(query.desde + query.hasta) > total" class="btn btn-sm btn-dark btnW waves-effect waves-light px-3 ms-2">Siguiente</button>
+                    </div>
+                </div>
+                <!-- BTN SIGUIENTE Y ANTERIOR -->
+
+            </div>
+        </div>
+        <!-- TABLE ALQUILERES -->
+
+    </div>
+
+
+
+</div>
+
+<!-- =========================================================================
+    NUEVO ALQUILER
+========================================================================= -->
+<div class="modal fade" id="nuevoAlquiler" tabindex="-1" aria-labelledby="nuevoBancoModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoBancoModal"><i class="bi-collection" style="font-size: 1rem"></i> Crear Alquiler Nuevo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <!-- BUSADOR DE CLIENTES -->
+                <div>
+                    <div class="mb-3">
+                        <label for="buscarCC" class="form-label">Buscar Cliente</label>
+                        <input autocomplete="false" type="search" class="form-control" id="buscarCC" placeholder="Buscar Cliente" (keyup)="searchClient(searchC.value)" #searchC>
+                        <div *ngIf="listClients.length > 0 && searchC.value.length !== 0" class="bg-white px-2 shadow col-auto" style="position: absolute; z-index: 1020;">
+
+                            <ul class="list-group list-group-flush overflow-auto" style="max-height: 150px;">
+
+                                <li class="list-group-item py-1">
+                                    <h6>Resultados: ({{ listClients.length }})</h6>
+                                </li>
+
+                                <li class="list-group-item py-1" *ngFor="let cliente of listClients">
+                                    <button [disabled]="!cliente.status" class="border-0 bg-white w-100 text-start" (click)="clientS = cliente; listClients = []; createForm.value.address = cliente.address" type="button">
+                                        <div class="d-flex">
+                                            <div class="align-self-center">
+                                                <span> {{ cliente.name }} </span>
+                                                <span> {{ cliente.cedula }} </span>
+                                                <span> {{ cliente.phone }} </span>
+                                                <span *ngIf="!cliente.status" class="badge rounded-pill bg-danger">Eliminado</span>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                        <!-- FORM -->
+                        <form [formGroup]="createForm" (ngSubmit)="crearAlquiler()">
+
+                            <div *ngIf="clientS">
+
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-auto">
+                                        <label for="Clien" class="col-form-label">Cliente</label>
+                                        <input type="text" id="Clien" class="form-control" readonly [value]="clientS.name || ''">
+                                    </div>
+
+                                    <div class="col-4">
+                                        <label for="phone" class="col-form-label">Telefono</label>
+                                        <input type="text" id="phone" class="form-control" readonly [value]="clientS.phone || ''">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="addres" class="col-form-label">Direccion</label>
+                                    <input #inAddress [value]="clientS.address || ''" type=" text " id="addres " class="form-control ">
+                                    <p *ngIf="campoValido( 'address') " class="mb-0 "> <small class="text-danger "> Este campo es obligatorio </small> </p>
+                                </div>
+
+                                <div class="my-3 ">
+                                    <h3>Productos</h3>
+                                    <label for="buscarP " class="form-label ">Buscar Produtos</label>
+                                    <input type="text" class="form-control " id="buscarP " placeholder="Buscar Producto " (keyup)="searchProduct(searchP.value) " #searchP>
+                                    <div *ngIf="listProducts.length> 0 && searchP.value.length !== 0" class="bg-white px-2 shadow col-auto" style="position: absolute; z-index: 1020;">
+
+                                        <ul class="list-group list-group-flush overflow-auto" style="max-height: 150px;">
+
+                                            <li class="list-group-item py-1">
+                                                <h6>Resultados: ({{ listProducts.length }})</h6>
+                                            </li>
+
+                                            <li class="list-group-item py-1" *ngFor="let product of listProducts">
+                                                <button *ngIf="product.status" (click)="productS = product; listProducts = []" [disabled]="product.inventario <= 0" class="border-0 bg-white w-100 text-start" type="button">
+                                                    <div class="d-flex">
+                                                        <div class="align-self-center">
+                                                            <span> {{ product.name }} </span>
+                                                            <span> {{ product.code }} </span>
+                                                            <span> {{ product.inventario }} </span>
+                                                            <span *ngIf="product.inventario <= 0" class="badge rounded-pill bg-danger">Agotado</span>
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- AGREGAR EL PRODUCTO -->
+                                <div class="mb-3">
+
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-4">
+                                            <label for="cod" class="col-form-label">Codigo</label>
+                                            <input type="text" id="cod" class="form-control" readonly [value]="productS?.code || ''">
+                                        </div>
+                                        <div class="col-auto">
+                                            <label for="ppp" class="col-form-label">Producto</label>
+                                            <input type="text" id="ppp" class="form-control" readonly [value]="productS?.name || ''">
+                                        </div>
+                                        <div class="col-auto">
+                                            <label for="ccc" class="col-form-label">Disponible</label>
+                                            <input type="text" id="ccc" class="form-control" readonly [value]="productS?.inventario || 0">
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-4">
+                                            <label for="cant" class="col-form-label">Cantidad</label>
+                                            <input type="number" min="1" id="cant" class="form-control" #cant>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <label for="dias" class="col-form-label">Dias</label>
+                                            <input type="number" min="1" id="dias" class="form-control" #dias>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <label for="prec" class="col-form-label">Precio</label>
+                                            <input type="number" min="1" id="prec" class="form-control" [value]="productS?.price || 0" #prec>
+                                        </div>
+
+
+                                    </div>
+
+                                    <button (click)="agregarItems(cant.value, dias.value, prec.value)" type="button" class="btn btn-primary my-3 w-100">Agregar</button>
+
+
+                                </div>
+
+
+                                <div>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col"></th>
+                                                <th scope="col">Cant.</th>
+                                                <th scope="col">Producto</th>
+                                                <th scope="col">Precio</th>
+                                                <th class="text-center" scope="col">Dias</th>
+                                                <th class="text-end" scope="col">Monto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngIf="items.length === 0">
+                                                <th colspan="6">No se a seleccionado ningun producto...</th>
+                                            </tr>
+
+                                            <ng-container *ngIf="items.length > 0">
+                                                <tr *ngFor="let item of items">
+                                                    <td>
+                                                        <button (click)="eliminarItem(item)" type="button" class="btn btn-link p-1 text-danger text-right"> 
+                                                            <i class="bi-trash"></i> 
+                                                        </button>
+                                                    </td>
+                                                    <td> {{ item.qty }} </td>
+                                                    <td> {{ item.producto.name }} </td>
+                                                    <td> {{ item.price | currency: 'COP' }} </td>
+                                                    <td class="text-center"> {{ item.dias }} </td>
+                                                    <td class="text-end"> {{ (item.price * item.qty) * item.dias | currency: 'COP' }} </td>
+                                                </tr>
+                                            </ng-container>
+
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="5" class="text-end">Total</th>
+                                                <th class="text-end"> {{amount | currency:'COP'}} </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+
+                                <button class="btn btn-primary ms-auto" type="submit"> Crear </button>
+
+                            </div>
+
+
+                        </form>
+
+                    </div>
+                </div>
+
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================================
+    NUEVO ALQUILER
+========================================================================= -->
