@@ -1,0 +1,1306 @@
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+<header>
+    <div class="bg-header-blue py-2 px-3 mb-2">
+        <h5 class="text-white m-0">Mi Empresa</h5>
+    </div>
+    <ul class="nav nav-tabs px-3" id="myTab" role="tablist">
+
+        <li class="nav-item" role="presentation">
+            <a class="nav-link text-dark active" id="ticket1-tab"><i class="bi-gear" style="font-size: 1rem"></i> Información de mi empresa</a>
+        </li>
+
+    </ul>
+</header>
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+
+<!-- =========================================================================
+    BODY 
+========================================================================= -->
+<div class="container-fluid my-2">
+    <!-- TITLE - SUBTITLE -->
+    <div>
+        <h5 class="text-dark">ADMINISTRACIÓN DE MI EMPRESA</h5>
+        <p>Configura toda la información de tu empresa desde este modulo.</p>
+    </div>
+    <!-- TITLE - SUBTITLE -->
+    <div class="row">
+
+        <!-- IMAGE -->
+        <div class="col-lg-4 text-center">
+            <div class="card">
+                <div class="card-body text-center">
+
+                    <!-- Image Product-->
+                    <ng-container *ngIf="empresa">
+                        <img *ngIf="!imgTemp" [src]="empresa.logo | imagen:'logo'" class="avatar-redondo-lg mx-auto" alt="">
+                    </ng-container>
+
+                    <!-- IMG TEMPO  imgTemp -->
+                    <img *ngIf="imgTemp" [src]="imgTemp" class="avatar-redondo-lg mx-auto" alt="">
+
+                    <!-- Description-->
+                    <div class="small font-italic text-muted mb-4">JPG - PNG - WEBP - no mayor a 5 mb</div>
+                    <div class="mb-3">
+                        <label for="formFileSm" class="form-label">Seleccionar Imagen</label>
+                        <input #fileImg class="form-control form-control-sm" id="formFileSm" type="file" (change)="cambiarImage($event.target.files[0])">
+                    </div>
+                    <!-- BTN upload Image -->
+                    <button *ngIf="imgTemp" class="btn btnW btn-primary waves-effect waves-light px-3" [disabled]="!subirImagen" (click)="subirImg()" type="button">Actualizar Imagen</button>
+
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <!-- ticketUpdate -->
+                        <button type="button" name="" id="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ticketUpdate">
+                            Actualizar Ticket
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- IMAGE -->
+
+        <!-- INFO PRODUCT -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    Informaciòn
+                </div>
+                <div class="card-body">
+
+                    <!-- FORM -->
+
+                    <form id="upProductForm" autocomplete="off" [formGroup]="formUpdate" (ngSubmit)="actualizarDatos()">
+
+                        <!-- =======================================================================
+                            DATOS PERSONALES 
+                        =========================================================================== -->
+                        <h5 class="text-muted">Datos de mi empresa</h5>
+
+                        <div class="mb-3">
+                            <div class="form-floating">
+                                <input formControlName="name" type="text" class="form-control" placeholder="Nombre de mi empresa">
+                                <label for="floatingInput">Nombre de mi empresa</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-floating">
+                                <input formControlName="address" type="text" class="form-control" placeholder="Direcciòn de mi empresa">
+                                <label for="floatingInput">Direcciòn de mi empresa</label>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input formControlName="phone" type="text" class="form-control" placeholder="Telefono">
+                                    <label for="floatingInput">Telefono</label>
+                                </div>
+                            </div>
+
+                            <div class="px-md-1 col-md-4">
+                                <div class="form-floating">
+                                    <input formControlName="nit" type="text" class="form-control" placeholder="Nit">
+                                    <label for="floatingInput">Nit</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input formControlName="tax" type="number" min="0" class="form-control" placeholder="Impuesto">
+                                    <label for="floatingInput">Impuesto</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-4">
+
+                                <div class="form-check">
+                                    <input formControlName="electronica" class="form-check-input" type="checkbox" id="electronica" #electronicaIn>
+                                    <label class="form-check-label" for="electronica">
+                                    Facturación Electronica
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4" *ngIf="electronicaIn.checked">
+                                <div class="form-floating">
+                                    <input formControlName="min" type="number" min="0" class="form-control" placeholder="Minimo para electronica">
+                                    <label for="floatingInput">Minimo</label>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-4" *ngIf="electronicaIn.checked">
+                                <button *ngIf="dataDataico" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#electronicaUpdate"> Actualizar</button>
+                                <button *ngIf="!dataDataico" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#electronicaPost"> Configurar</button>
+
+                            </div>
+
+                            <div class="col-md-12 mt-3">
+                                <div class="form-group row">
+                                    <label for="pais" class="col-sm-auto col-form-label">Pais</label>
+                                    <div class="col-sm-6">
+                                        <select formControlName="pais" id="pais" class="custom-select custom-select-sm">
+                                            <option value="Colombia" >Colombia</option>
+                                            <option value="USA" >USA</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <h5 class="text-muted">Configuración</h5>
+
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+
+                                <div class="form-check">
+                                    <input formControlName="printpos" class="form-check-input" type="checkbox" id="printpos" checked #printpos>
+                                    <label class="form-check-label" for="printpos">
+                                    Impresora POS
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <div class="form-check">
+                                    <input formControlName="marca" class="form-check-input" type="checkbox" id="marca" checked #marca>
+                                    <label class="form-check-label" for="marca">
+                                    Marca de agua en factura
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <div class="form-check">
+                                    <input formControlName="cotizacion" class="form-check-input" type="checkbox" id="cotizacion" checked #cotizacion>
+                                    <label class="form-check-label" for="cotizacion">
+                                    Cotizacion
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <div class="form-check">
+                                    <input formControlName="paiddirect" class="form-check-input" type="checkbox" id="paiddirect" checked #paiddirectC>
+                                    <label class="form-check-label" for="paiddirect">
+                                    Pago Directo
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <div class="form-check">
+                                    <input formControlName="kiosco" class="form-check-input" type="checkbox" id="kiosco" checked #kioscoC>
+                                    <label class="form-check-label" for="kiosco">
+                                    Kiosco
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-12 mt-3" *ngIf="printpos.checked">
+                                <div class="form-group row">
+                                    <label for="impresora" class="col-sm-auto col-form-label">Tipo de impresora</label>
+                                    <div class="col-sm-6">
+                                        <select formControlName="impresora" id="impresora" class="custom-select custom-select-sm">
+                                            <option disabled selected>Seleccionar Impresora</option>
+                                            <option value="58" >58</option>
+                                            <option value="80" >80</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row mb-3">
+
+
+
+                            <div class="col-md-4">
+
+                                <div class="form-check">
+                                    <input formControlName="decimal" class="form-check-input" type="checkbox" id="decimal">
+                                    <label class="form-check-label" for="decimal">
+                                        Decimales
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-12 mt-3">
+                                <div class="form-group row">
+                                    <label for="moneda" class="col-sm-auto col-form-label">Moneda</label>
+                                    <div class="col-sm-6">
+                                        <select #inMoneda formControlName="moneda" id="moneda" class="custom-select custom-select-sm">
+                                            <option disabled selected>Seleccionar moneda</option>
+                                            <option value="COP" >COP</option>
+                                            <option value="USD" >USD</option>
+                                            <option value="BS" >BS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <h5 class="text-muted">Divisas o Multimonedas</h5>
+
+                        <div class="row mb-3" *ngIf="inMoneda.value !== 'USD'">
+
+                            <div class="col-md-auto">
+
+                                <div class="form-check">
+                                    <input formControlName="usd" class="form-check-input" type="checkbox" id="divisas" #inUsd>
+                                    <label class="form-check-label" for="divisas">
+                                    USD
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-auto" *ngIf="inUsd.checked">
+                                <div class="form-floating">
+                                    <input formControlName="currencyusd" type="number" min="0" class="form-control" placeholder="Divisa USD">
+                                    <label for="floatingInput">Divisa USD</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row mb-3" *ngIf="inMoneda.value !== 'bs'">
+
+                            <div class="col-md-auto">
+
+                                <div class="form-check">
+                                    <input formControlName="bs" class="form-check-input" type="checkbox" id="divisas" #inBs>
+                                    <label class="form-check-label" for="divisas">
+                                    BS
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-auto" *ngIf="inBs.checked">
+                                <div class="form-floating">
+                                    <input formControlName="currencybs" type="number" min="0" class="form-control" placeholder="Divisa BS">
+                                    <label for="floatingInput">Divisa BS</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row mb-3" *ngIf="inMoneda.value !== 'COP'">
+
+                            <div class="col-md-auto">
+
+                                <div class="form-check">
+                                    <input formControlName="cop" class="form-check-input" type="checkbox" id="divisascop" #inCop>
+                                    <label class="form-check-label" for="divisascop">
+                                    COP
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-auto" *ngIf="inCop.checked">
+                                <div class="form-floating">
+                                    <input id="currencycop" formControlName="currencycop" type="number" min="0" class="form-control" placeholder="Divisa COP">
+                                    <label for="currencycop">Divisa COP</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <h5 class="text-muted">Impuestos</h5>
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-4">
+
+                                <div class="form-check">
+                                    <input formControlName="impuesto" class="form-check-input" type="checkbox" value="" id="impuesto" #cImpuesto>
+                                    <label class="form-check-label" for="impuesto">
+                                    Impuestos
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-12" *ngIf="cImpuesto.checked">
+                                <div class="form-group">
+                                    <label for="exampleFormControlSelect1">Seleccionar el tipo de impuesto</label>
+                                    <select formControlName="tipoImpuesto" class="form-control mb-0" id="exampleFormControlSelect1">
+                                      <option value="" selected>Seleccionar</option>
+                                      <option value="responsable" >Responsable de IVA</option>
+                                      <option value="consumo" >Impuesto al Consumo</option>
+                                      <option value="noresponsable" >No responsable</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- <div class="col-md-4" *ngIf="cImpuesto.checked">
+
+                                <div class="form-check">
+                                    <input formControlName="responsable" class="form-check-input" type="checkbox" value="" id="responsable" #responsable>
+                                    <label class="form-check-label" for="responsable">
+                                    Responsable de iva
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4" *ngIf="cImpuesto.checked">
+
+                                <div class="form-check">
+                                    <input formControlName="impuestoconsumo" class="form-check-input" type="checkbox" value="" id="impuestoconsumo" #iCon>
+                                    <label class="form-check-label" for="impuestoconsumo">
+                                    Impuesto al consumo
+                                  </label>
+                                </div>
+
+                            </div> -->
+
+                        </div>
+
+                        <div class="row mb-3" *ngIf="cImpuesto.checked">
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input formControlName="resolucion" type="text" class="form-control" placeholder="Telefono">
+                                    <label for="floatingInput">Numero de Resolución</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input formControlName="prefijopos" type="text" class="form-control" placeholder="Telefono">
+                                    <label for="floatingInput">Prefijo POS</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <h5 class="text-muted">Propinas, Comisiones, Datafon</h5>
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-4">
+
+                                <div class="form-check">
+                                    <input formControlName="tip" class="form-check-input" type="checkbox" id="tip">
+                                    <label class="form-check-label" for="tip">
+                                    Propina
+                                  </label>
+                                </div>
+
+                                <div class="form-floating">
+                                    <input formControlName="propina" type="number" class="form-control" placeholder="Porcentaje">
+                                    <label for="floatingInput">% Porcentaje</label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 mb-2">
+
+                                <div class="form-check">
+                                    <input formControlName="commission" class="form-check-input" type="checkbox" id="tip">
+                                    <label class="form-check-label" for="tip">
+                                    Comisión Unica
+                                  </label>
+                                </div>
+
+                                <div class="form-floating">
+                                    <input formControlName="comision" type="number" class="form-control" placeholder="Porcentaje">
+                                    <label for="floatingInput">% Comisión</label>
+                                </div>
+
+                            </div>
+
+                            <div class="container-fluid">
+                                <h6 class="text-muted mb-1">Regla de Comisiones</h6>
+                                <p class="mb-2 text-muted text-break"> <small>-  Agrega nuevas reglas para las comisiones de tus vendedores, cuando ellos superan un monto de venta le asignas una comisión específica.</small></p>
+
+                                <div class="form-check">
+                                    <input formControlName="commissions" class="form-check-input" type="checkbox" id="comisiones">
+                                    <label class="form-check-label" for="comisiones">
+                                    Comisiones
+                                  </label>
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" placeholder="Monto" #montoC>
+                                            <label for="floatingInput">Monto</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" placeholder="Comisión" #comisionC>
+                                            <label for="floatingInput">Comisión</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <button (click)="agregarComision(montoC.value, comisionC.value)" type="button" class="btn btn-outline-primary h-100">Agregar</button>
+                                    </div>
+
+                                    <div class="col-12 my-2" *ngIf="comisiones.length > 0">
+                                        <h6 class="text-muted mb-1">Tabla de Comisiones</h6>
+
+                                        <div class="table-responsive">
+
+                                            <table class="table table-striped table-sm table-borderless align-middle">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Monto</th>
+                                                        <th scope="col">Comision</th>
+                                                        <th scope="col"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="align-middle" *ngFor="let item of comisiones; let i = index">
+                                                        <th class="align-middle" scope="row"> {{ i + 1 }} </th>
+                                                        <td class="align-middle"> {{ item.monto | number }} </td>
+                                                        <td class="align-middle"> {{ (item.comision/100) | percent }} </td>
+                                                        <td class="align-middle"> <button type="button" (click)="borrarComision(i)" class="btn btn-link p-1 text-danger"><i class="bi-trash" style="font-size: 0.9rem"></i></button> </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-4">
+
+                                        <div class="form-check">
+                                            <input formControlName="datafon" class="form-check-input" type="checkbox" id="datafon">
+                                            <label class="form-check-label" for="datafon">
+                                            Datafon
+                                          </label>
+                                        </div>
+
+                                        <div class="form-floating">
+                                            <input formControlName="comidatafon" type="number" class="form-control" placeholder="Porcentaje">
+                                            <label for="floatingInput">% Porcentaje de datafon</label>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <h5 class="text-muted">Modulos</h5>
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-3">
+
+                                <div class="form-check">
+                                    <input formControlName="comandas" class="form-check-input" type="checkbox" id="comandas">
+                                    <label class="form-check-label" for="comandas">
+                                    Comandas
+                                  </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <div class="form-check">
+                                    <input formControlName="alquileres" class="form-check-input" type="checkbox" id="alquiler">
+                                    <label class="form-check-label" for="alquiler">
+                                    Alquileres
+                                  </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <div class="form-check">
+                                    <input formControlName="parqueadero" class="form-check-input" type="checkbox" id="parqueadero">
+                                    <label class="form-check-label" for="parqueadero">
+                                    Parqueadero
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <div class="form-check">
+                                    <input formControlName="taller" class="form-check-input" type="checkbox" id="taller">
+                                    <label class="form-check-label" for="taller">
+                                    Taller
+                                  </label>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <div class="form-check">
+                                    <input formControlName="fruver" class="form-check-input" type="checkbox" id="fruver">
+                                    <label class="form-check-label" for="fruver">
+                                    Fruver
+                                  </label>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <h5 class="text-muted">Bascula con impresora de codigos</h5>
+
+
+
+                        <div class="row mb-3">
+
+
+
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input formControlName="bascula" class="form-check-input" type="checkbox" id="bascula">
+                                    <label class="form-check-label" for="bascula">
+                                    Bascula
+                                  </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input formControlName="basculakg" class="form-check-input" type="checkbox" id="basculakg">
+                                    <label class="form-check-label" for="basculakg">
+                                    Bascula KG
+                                  </label>
+                                </div>
+                            </div>
+
+                            
+                            <div  class="col-md-3">
+                                <div class="form-group row">
+                                    <select id="basculat" class="custom-select custom-select-sm" (change)="changeBascula(modelBascula.value)" #modelBascula [value]="basculaT">
+                                        <option value="1">Modelo 1</option>
+                                        <option value="2">Modelo 2</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div  class="col-md-3">
+                                <div class="form-group row">
+                                    <select id="basculat" class="custom-select custom-select-sm" (change)="changePort(puertoBasculaS.value)" #puertoBasculaS [value]="puertoBascula">
+                                        <option value="COM1">COM1</option>
+                                        <option value="COM2">COM2</option>
+                                        <option value="COM3">COM3</option>
+                                        <option value="COM4">COM4</option>
+                                        <option value="COM5">COM5</option>
+                                        <option value="COM6">COM6</option>
+                                        <option value="COM7">COM7</option>
+                                        <option value="COM8">COM8</option>
+                                        <option value="COM9">COM9</option>
+                                        <option value="COM10">COM10</option>
+                                        <option value="COM11">COM11</option>
+                                        <option value="COM12">COM12</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-check">
+                                    <input #bascIn formControlName="basculaimp" class="form-check-input" type="checkbox" id="basculaimp">
+                                    <label class="form-check-label" for="basculaimp">
+                                        Bascula Impresora
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div *ngIf="bascIn.checked" class="col-md-6">
+
+                                <div class="form-floating">
+                                    <input formControlName="basculacode" type="text" class="form-control" placeholder="2000">
+                                    <label for="floatingInput">El codigo de la bascula inicia en</label>
+                                </div>
+
+                            </div>
+
+                            <div *ngIf="bascIn.checked" class="col-md-6">
+                                <div class="form-group row">
+                                    <select formControlName="basculatype" id="basculatype" class="custom-select custom-select-sm" value="precio">
+                                        <option value="peso" >Imprime Peso</option>
+                                        <option value="precio" selected>Imprime Precio</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="row">
+                            <div class="text-danger mb-2">
+                                <p *ngIf="campoValido('name')" class="mb-1 animated fadeIn">- El nombre es obligatorio</p>
+                                <p *ngIf="campoValido('address')" class="mb-1 animated fadeIn">- La dirección es obligatoria</p>
+                                <p *ngIf="campoValido('phone')" class="mb-1 animated fadeIn">- Debes de agregar un numero telefonico</p>
+                                <p *ngIf="campoValido('nit')" class="mb-1 animated fadeIn">- El nit es obligatorio</p>
+                            </div>
+                        </div>
+
+
+                        <button type="submit" class="btn btnW waves-effect waves-ligth px-3 btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- INFO PRODUCT -->
+
+
+    </div>
+
+</div>
+<!-- =========================================================================
+    BODY 
+========================================================================= -->
+
+<!-- =========================================================================
+    CONFIGURAR FACTURACION ELECTRONICA
+========================================================================= -->
+<div class="modal fade" id="electronicaPost" tabindex="-1" aria-labelledby="electronicaPostModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="electronicaPostModal"><i class="bi-collection" style="font-size: 1rem"></i> Información para factura electronica</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="container">
+
+                    <form autocomplete="off" [formGroup]="dataicoForm" (ngSubmit)="createDataico()">
+
+                        <!-- =======================================================================
+                        Configuracion
+                    =========================================================================== -->
+                        <hr>
+                        <h5 class="text-muted text-center">Informaciòn Dataico</h5>
+                        <hr>
+
+                        <div class="row mb-2">
+
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="">Token</label>
+                                <div class="form-floating">
+                                    <input formControlName="authtoken" type="text" class="form-control" placeholder="Token de dataico">
+                                    <label for="floatingInput">Token</label>
+                                </div>
+                                <p *ngIf="validate('authtoken')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="">ID Dataico </label>
+                                <div class="form-floating">
+                                    <input formControlName="dataico_account_id" type="text" class="form-control " placeholder="ID de dataico">
+                                    <label for="floatingInput">ID Dataico </label>
+                                </div>
+                                <p *ngIf="validate('dataico_account_id')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                        </div>
+
+                        <hr>
+                        <h5 class="text-muted text-center">Mas Información</h5>
+                        <hr>
+
+                        <div class="row mb-2">
+
+                            <!-- TIPO DE FACTURACION -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="invoiceTypeCode" class="col-sm-auto col-form-label">Tipo de factura</label>
+                                <select formcontrolname="invoice_type_code" class="form-select" id="invoiceTypeCode" aria-label="Floating label select example">
+                                    <option value="FACTURA_VENTA" selected>FACTURA DE VENTA</option>
+                                    <option value="FACTURA_EXPORTACION" >FACTURA DE EXPORTACION</option>
+                                    <option value="FACTURA_CONTINGENCIA" >FACTURA DE CONTINGENCIA </option>
+                                </select>
+                            </div>
+
+                            <!-- RESOLUCION -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="resolutionNumber">Resolución </label>
+                                <div class="form-floating">
+                                    <input id="resolutionNumber" formControlName="resolution_number" type="text" class="form-control" placeholder="Resolución">
+                                    <label for="floatingInput">Resolución </label>
+                                </div>
+                                <p *ngIf="validate('resolution_number')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- PREFIJO -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="prefixNumber">Prefijo </label>
+                                <div class="form-floating">
+                                    <input id="prefixNumber" formControlName="prefix" type="text" class="form-control" placeholder="Prefijo">
+                                    <label for="floatingInput">Prefijo </label>
+                                </div>
+                                <p *ngIf="validate('prefix')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- DESDE -->
+                            <div class="col-md-6 mb-3 px-md-1">
+                                <label for="desdeNumber">Desde </label>
+                                <div class="form-floating">
+                                    <input id="desdeNumber" formControlName="desde" type="number" min="0" class="form-control" placeholder="Desde">
+                                    <label for="floatingInput">Desde </label>
+                                </div>
+                                <p *ngIf="validate('desde')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- HASTA -->
+                            <div class="col-md-6 mb-3 px-md-1">
+                                <label for="hastaNumber">Hasta </label>
+                                <div class="form-floating">
+                                    <input id="hastaNumber" formControlName="hasta" type="number" min="0" class="form-control" placeholder="Hasta">
+                                    <label for="floatingInput">Hasta </label>
+                                </div>
+                                <p *ngIf="validate('hasta')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- FACTURACION FLEXIBLE -->
+                            <div class="col-md-12">
+                                <div class="form-check">
+                                    <input formControlName="flexible" class="form-check-input" type="checkbox" id="flexibleInvoice">
+                                    <label class="form-check-label" for="flexibleInvoice">
+                                    Facturación Flexible
+                                  </label>
+                                </div>
+                            </div>
+
+                            <!-- TIPO DE OPERACION -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="operationType" class="col-sm-auto col-form-label">Tipo de operación</label>
+                                <select formControlName="operation" class="form-select" id="operationType" aria-label="Floating label select example">
+                                    <option value="ESTANDAR" selected> ESTANDAR </option>
+                                    <option value="AIU"> AIU </option>
+                                    <option value="MANDATO"> MANDATO </option>
+                                    <option value="EXPORTACION"> EXPORTACION </option>
+                                    <option value="SS_RECAUDO"> SS RECAUDO </option>
+                                    <option value="SS_CUFE"> SS CUFE </option>
+                                    <option value="SS_CUDE"> SS CUDE </option>
+                                    <option value="SS_POS"> SS POS </option>
+                                    <option value="SS_NUM"> SS NUM </option>
+                                    <option value="SS_REPORTE"> SS REPORTE </option>
+                                    <option value="SS_SIN_APORTE "> SS SIN APORTE  </option>
+                                </select>
+                            </div>
+
+                            <!-- PRUEBAS O DESARROLLO -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="env" class="col-sm-auto col-form-label">Pruebas o Producción</label>
+                                <select formControlName="env" class="form-select" id="env" aria-label="Floating label select example">
+                                    <option value="PRUEBAS" selected>PRUEBAS</option>
+                                    <option value="PRODUCCION" >PRODUCCION </option>
+                                </select>
+                            </div>
+
+                            <!-- DEPARTAMENTO ** -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="departamentoS" class="col-sm-auto col-form-label">Departamento</label>
+                                <select formControlName="department" class="form-select" id="departamentoS" #departmentSSUp (change)="searchCities(departmentSSUp.value)">
+                                    <option value="" >Seleccionar Departamento</option>
+                                    <option *ngFor="let department of departments" [value]="department.codigo" >{{department.departamento}}</option>
+                                </select>
+                            </div>
+
+                            <!-- CIUDAD ** -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="ciudadS" class="col-sm-auto col-form-label">Ciudad</label>
+                                <select formControlName="city" class="form-select" id="ciudadS" aria-label="Floating label select example">
+                                    <option value="" selected>Seleccionar Ciudad</option>
+                                    <option *ngFor="let city of ListCities" [value]="city.codigo" >{{city.ciudad}}</option>
+                                </select>
+                            </div>
+
+                            <!-- EMAIL -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="resolutionNumber">Correo </label>
+                                <div class="form-floating">
+                                    <input id="resolutionNumber" formControlName="email" type="text" class="form-control" placeholder="Correo">
+                                    <label for="floatingInput">Correo </label>
+                                </div>
+                                <p *ngIf="validate('email')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- RESOLUCION -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="resolutionNumber">Telefono </label>
+                                <div class="form-floating">
+                                    <input id="resolutionNumber" formControlName="phone" type="text" class="form-control" placeholder="Telefono">
+                                    <label for="floatingInput">Telefono </label>
+                                </div>
+                                <p *ngIf="validate('phone')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- ENVIAR A LA DIAN -->
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input formControlName="send_dian" class="form-check-input" type="checkbox" id="sendDian">
+                                    <label class="form-check-label" for="sendDian">
+                                    Enviar a la DIAN
+                                  </label>
+                                </div>
+                            </div>
+
+                            <!-- ENVIAR FACTURA AL CORREO -->
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input formControlName="send_email" class="form-check-input" type="checkbox" id="sendEmail">
+                                    <label class="form-check-label" for="sendEmail">
+                                    Enviar factura al correo
+                                  </label>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <button type="submit" class="btn btnW waves-effect waves-ligth px-3 btn-primary w-100">Guardar</button>
+                    </form>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================================
+    CONFIGURAR FACTURACION ELECTRONICA
+========================================================================= -->
+
+<!-- =========================================================================
+    ACTUALIZAR CONFIGURACION DE FACTURACION ELECTRONICA
+========================================================================= -->
+<div class="modal fade" id="electronicaUpdate" tabindex="-1" aria-labelledby="electronicaUpdateModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="electronicaUpdateModal"><i class="bi-collection" style="font-size: 1rem"></i>Actualizar Información para factura electronica</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="container">
+
+                    <form autocomplete="off" [formGroup]="dataicoUpdateForm" (ngSubmit)="updateDataico()">
+
+                        <!-- =======================================================================
+                        Configuracion
+                        =========================================================================== -->
+                        <hr>
+                        <h5 class="text-muted text-center">Informaciòn Dataico</h5>
+                        <hr>
+
+                        <div class="row mb-2">
+
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="">Token</label>
+                                <div class="form-floating">
+                                    <input formControlName="authtoken" type="text" class="form-control " placeholder="Token de dataico">
+                                    <label for="floatingInput">Token</label>
+                                </div>
+                                <p *ngIf="validate('authtoken')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="">ID Dataico </label>
+                                <div class="form-floating">
+                                    <input formControlName="dataico_account_id" type="text" class="form-control " placeholder="ID de dataico">
+                                    <label for="floatingInput">ID Dataico </label>
+                                </div>
+                                <p *ngIf="validate('dataico_account_id')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                        </div>
+
+                        <hr>
+                        <h5 class="text-muted text-center">Mas Información</h5>
+                        <hr>
+
+                        <div class="row mb-2">
+
+                            <!-- TIPO DE FACTURACION -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="invoiceTypeCode" class="col-sm-auto col-form-label">Tipo de factura</label>
+                                <select formcontrolname="invoice_type_code" [value]="dataico?.invoice_type_code" class="form-select" id="invoiceTypeCode" aria-label="Floating label select example">
+                                    <option value="FACTURA_VENTA">FACTURA DE VENTA</option>
+                                    <option value="FACTURA_EXPORTACION" >FACTURA DE EXPORTACION</option>
+                                    <option value="FACTURA_CONTINGENCIA" >FACTURA DE CONTINGENCIA </option>
+                                </select>
+                            </div>
+
+                            <!-- RESOLUCION -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="resolutionNumber">Resolución </label>
+                                <div class="form-floating">
+                                    <input id="resolutionNumber" formControlName="resolution_number" type="text" class="form-control" placeholder="Resolución">
+                                    <label for="floatingInput">Resolución </label>
+                                </div>
+                                <p *ngIf="validate('resolution_number')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- PREFIJO -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="prefixNumber">Prefijo </label>
+                                <div class="form-floating">
+                                    <input id="prefixNumber" formControlName="prefix" type="text" class="form-control" placeholder="Prefijo">
+                                    <label for="floatingInput">Prefijo </label>
+                                </div>
+                                <p *ngIf="validate('prefix')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- DESDE -->
+                            <div class="col-md-6 mb-3 px-md-1">
+                                <label for="desdeNumber">Desde </label>
+                                <div class="form-floating">
+                                    <input id="desdeNumber" formControlName="desde" type="number" min="0" class="form-control" placeholder="Desde">
+                                    <label for="floatingInput">Desde </label>
+                                </div>
+                                <p *ngIf="validate('desde')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- HASTA -->
+                            <div class="col-md-6 mb-3 px-md-1">
+                                <label for="hastaNumber">Hasta </label>
+                                <div class="form-floating">
+                                    <input id="hastaNumber" formControlName="hasta" type="number" min="0" class="form-control" placeholder="Hasta">
+                                    <label for="floatingInput">Hasta </label>
+                                </div>
+                                <p *ngIf="validate('hasta')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- FACTURACION FLEXIBLE -->
+                            <div class="col-md-12">
+                                <div class="form-check">
+                                    <input formControlName="flexible" class="form-check-input" type="checkbox" id="flexibleInvoice">
+                                    <label class="form-check-label" for="flexibleInvoice">
+                                    Facturación Flexible
+                                  </label>
+                                </div>
+                            </div>
+
+                            <!-- TIPO DE OPERACION -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="operationType" class="col-sm-auto col-form-label">Tipo de operación</label>
+                                <select formControlName="operation" class="form-select" id="operationType" aria-label="Floating label select example">
+                                    <option value="ESTANDAR"> ESTANDAR </option>
+                                    <option value="AIU"> AIU </option>
+                                    <option value="MANDATO"> MANDATO </option>
+                                    <option value="EXPORTACION"> EXPORTACION </option>
+                                    <option value="SS_RECAUDO"> SS RECAUDO </option>
+                                    <option value="SS_CUFE"> SS CUFE </option>
+                                    <option value="SS_CUDE"> SS CUDE </option>
+                                    <option value="SS_POS"> SS POS </option>
+                                    <option value="SS_NUM"> SS NUM </option>
+                                    <option value="SS_REPORTE"> SS REPORTE </option>
+                                    <option value="SS_SIN_APORTE "> SS SIN APORTE  </option>
+                                </select>
+                            </div>
+
+                            <!-- PRUEBAS O DESARROLLO -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="env" class="col-sm-auto col-form-label">Pruebas o Producción</label>
+                                <select formControlName="env" class="form-select" id="env" aria-label="Floating label select example">
+                                    <option value="PRUEBAS">PRUEBAS</option>
+                                    <option value="PRODUCCION" >PRODUCCION </option>
+                                </select>
+                            </div>
+
+                            <!-- DEPARTAMENTO ** -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="departamentoS" class="col-sm-auto col-form-label">Departamento</label>
+                                <select formControlName="department" class="form-select" id="departamentoS" #departmentSSUpp (change)="searchCities(departmentSSUpp.value)">
+                                    <option value="" >Seleccionar Departamento</option>
+                                    <option *ngFor="let department of departments" [value]="department.codigo" >{{department.departamento}}</option>
+                                </select>
+                            </div>
+
+                            <!-- CIUDAD ** -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="ciudadS" class="col-sm-auto col-form-label">Ciudad</label>
+                                <select formControlName="city" class="form-select" id="ciudadS" aria-label="Floating label select example">
+                                    <option value="" selected>Seleccionar Ciudad</option>
+                                    <option *ngFor="let city of ListCities" [value]="city.codigo" >{{city.ciudad}}</option>
+                                </select>
+                            </div>
+
+                            <!-- EMAIL -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="resolutionNumber">Correo </label>
+                                <div class="form-floating">
+                                    <input id="resolutionNumber" formControlName="email" type="text" class="form-control" placeholder="Correo">
+                                    <label for="floatingInput">Correo </label>
+                                </div>
+                                <p *ngIf="validate('email')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- RESOLUCION -->
+                            <div class="col-md-12 mb-3 px-md-1">
+                                <label for="resolutionNumber">Telefono </label>
+                                <div class="form-floating">
+                                    <input id="resolutionNumber" formControlName="phone" type="text" class="form-control" placeholder="Telefono">
+                                    <label for="floatingInput">Telefono </label>
+                                </div>
+                                <p *ngIf="validate('phone')" class="mb-1 animated fadeIn text-danger"> <small>Este campo es obligatorio</small> </p>
+                            </div>
+
+                            <!-- ENVIAR A LA DIAN -->
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input formControlName="send_dian" class="form-check-input" type="checkbox" id="sendDian">
+                                    <label class="form-check-label" for="sendDian">
+                                    Enviar a la DIAN
+                                  </label>
+                                </div>
+                            </div>
+
+                            <!-- ENVIAR FACTURA AL CORREO -->
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input formControlName="send_email" class="form-check-input" type="checkbox" id="sendEmail">
+                                    <label class="form-check-label" for="sendEmail">
+                                    Enviar factura al correo
+                                  </label>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <button type="submit" class="btn btnW waves-effect waves-ligth px-3 btn-primary w-100">Guardar</button>
+                    </form>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================================
+    ACTUALIZAR CONFIGURACION DE FACTURACION ELECTRONICA
+========================================================================= -->
+
+<!-- =========================================================================
+    ACTUALIZAR TICKET
+========================================================================= -->
+<div class="modal fade" id="ticketUpdate" tabindex="-1" aria-labelledby="ticketUpdateModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ticketUpdateModal"><i class="bi-collection" style="font-size: 1rem"></i>Configurar Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="d-flex align-items-center justify-content-around flex-wrap gap-2">
+
+                    <!-- TICKET -->
+                    <div>
+
+                        <div class="d-flex justify-content-center">
+
+                            <div class="card border-0 pb-4" [ngStyle]="{'width': empresa?.impresora === 58 ? '14rem' : '24rem'}" style="width: 14rem; color:black; background: white;" id="printDiv">
+
+                                <!-- EMPRESA -->
+                                <div class="card-body px-1 mb-2" style="border-bottom: 2px solid black;">
+
+                                    <div class="d-flex justify-content-center">
+                                        <img *ngIf="empresa?.logo" [src]="empresa?.logo | imagen:'logo'" class="mx-auto" width="200px" alt="">
+                                    </div>
+
+                                    <h4 class="card-title mb-0 text-wrap text-center"> {{ empresa?.name }} </h4>
+                                    <p class="text-center mb-0" *ngFor="let text of ticketHeader" style="line-height: 1rem;"> {{ text }} </p>
+
+                                </div>
+                                <!-- EMPRESA -->
+
+                                <!-- CLIENTE -->
+                                <div class="pb-2" style="border-bottom: 2px solid black;">
+                                    <h6 class="mb-0 text-wrap text-left">
+                                        CLIENTE / RAZON SOCIAL <br>
+                                        <small class="text-wrap fw-normal"> Ocasional </small>
+                                    </h6>
+
+                                    <h6 class="mb-0 text-wrap text-left">
+                                        CC / NIT <br>
+                                        <small class="text-wrap fw-normal"> 00000000 </small>
+                                    </h6>
+                                    <h6 class="mb-0 text-wrap text-left">
+                                        TELEFONO <br>
+                                        <small class="text-wrap fw-normal"> {{ '--- ------' }} </small>
+                                    </h6>
+                                </div>
+                                <!-- CLIENTE -->
+
+                                <!-- FACTURA -->
+                                <div class="py-2" style="border-bottom: 2px solid black;">
+                                    <h6 *ngIf="empresa" class="mb-0 text-wrap text-left">{{ empresa.type }}: 513</h6>
+                                    <h6 class="mb-0 text-wrap text-left">Control: 513</h6>
+                                    <small class="mb-0 text-wrap text-left">Fecha: 05/06/2024</small>
+                                </div>
+                                <!-- FACTURA -->
+
+                                <table class="table table-borderless table-hover table-sm">
+                                    <tbody style="color: black;">
+                                        <tr class="trHover">
+                                            <td class="py-0" style="line-height: 0.8rem">
+                                                <small class="text-wrap"> 1 x {{5000 | number}} </small> <br>
+                                                <small class="text-wrap"> Item 1<strong class="fw-bolde text-black">M</strong></small>
+                                            </td>
+                                            <td class="text-end">
+                                                <small> 0% </small>
+                                            </td>
+                                            <td class="py-0">
+                                                <small *ngIf="!empresa?.impuesto" class="text-wrap"> {{ 5000 | number }} </small>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="" style="border-top: 2px solid black;">
+                                            <td>
+                                                <h6 class="mb-0 text-wrap text-left">Sub-total</h6>
+                                            </td>
+                                            <td colspan="2" class="fw-bold">
+                                                <h6 class="mb-0 text-wrap text-rigth"> {{ 5000 | number }} </h6>
+                                            </td>
+                                        </tr>
+
+                                        <!-- TOTAL -->
+                                        <tr class="" style="border-top: 2px solid black;">
+                                            <td>
+                                                <h6 class="mb-0 text-wrap text-left">Total</h6>
+                                            </td>
+                                            <td colspan="2" class="fw-bold">
+                                                <h6 class="mb-0 text-wrap text-rigth"> {{ 5000 | number}} </h6>
+                                            </td>
+                                        </tr>
+                                        <!-- TOTAL -->
+
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="">ITEMS</th>
+                                            <th> 3 </th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
+                                <hr class="my-1">
+
+                                <h6 class="mb-0">Nota:</h6>
+                                <p class="">- Excelente </p>
+
+                                <hr class="my-1">
+
+                                <p class="text-center mb-0" *ngFor="let text of ticketfooter" style="line-height: 1rem;"> {{ text }} </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- CONFIGURACION -->
+                    <div class="d-flex justify-content-center">
+
+                        <div>
+
+                            <div class="card">
+
+                                <div class="card-body">
+
+                                    <div class="mb-3">
+                                        <label for="ttheader" class="form-label fw-bold">Header del Ticket</label>
+                                        <textarea class="form-control" (keyup)="upHeader(tHeader?.value)" #tHeader id="ttheader" rows="5" [value]="empresa?.header"></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="ttype" class="form-label fw-bold">Tipo de documento</label>
+                                        <input type="text" (keyup)="empresa.type = tType.value" #tType class="form-control" id="ttype" [value]="empresa?.type">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="ttfooter" class="form-label fw-bold">Footer del Ticket</label>
+                                        <textarea class="form-control" (keyup)="upFooter(tFooter?.value)" #tFooter id="ttfooter" rows="5" [value]="empresa?.footer"></textarea>
+                                    </div>
+
+
+                                    <div class="d-grid gap-2 mt-2">
+                                        <button type="button" (click)="updateTicket()" class="btn btn-primary">
+                                            Actualizar Ticket
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================================
+    ACTUALIZAR TICKET
+========================================================================= -->
