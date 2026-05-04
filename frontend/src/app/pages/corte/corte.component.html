@@ -1,0 +1,1261 @@
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+<header>
+    <div class="bg-header-blue py-2 px-3 mb-2">
+        <h5 class="text-white m-0">Corte</h5>
+    </div>
+    <ul class="nav nav-tabs px-3" id="myTab" role="tablist">
+
+        <li class="nav-item" role="presentation">
+            <a class="nav-link text-dark active" id="facturas-tab"><i class="bi-bar-chart" style="font-size: 1rem"></i> Corte</a>
+        </li>
+    </ul>
+</header>
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+
+<!-- =========================================================================
+    BODY
+========================================================================= -->
+<div *ngIf="user.privilegios.cierre" class="container-fluid mb-5">
+
+    <div class="my-4">
+        <h5 class="text-dark">Realizar Cierre de caja</h5>
+        <p>Automaticamente se guardara toda la información de caja y el usuario</p>
+        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#cierre"> <i class="bi-calculator"></i> Cerrar Caja</button>
+    </div>
+
+    <div class="row d-flex justify-content-center">
+
+        <div class="col-auto p-2">
+            <div class="card shadow px-2" style="width: 18rem;">
+
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Dinero en caja</h5>
+                </div>
+
+                <div class="table-responsive ">
+                    <table class="table table-borderless table-hover table-sm ">
+
+                        <tbody>
+
+                            <tr style="color: black;">
+                                <td colspan="2"> Fondo Caja </td>
+                                <td> {{ inicial | divisa }}</td>
+                            </tr>
+
+                            <tr style="color: black;">
+                                <td colspan="2"> Abonos Creditos Efectivo </td>
+                                <td> {{ abEfectivo | divisa }}</td>
+                            </tr>
+
+                            <tr style="color: black;">
+                                <td colspan="2"> Ventas en efectivo </td>
+                                <td> {{ efectivo | divisa }} </td>
+                            </tr>
+
+                            <tr *ngIf="empresa?.parqueadero" style="color: black;">
+                                <td colspan="2"> Parqueadero </td>
+                                <td> {{ parqueos | divisa }} </td>
+                            </tr>
+
+                            <tr style="color: black;">
+                                <td colspan="2"> Entradas </td>
+                                <td> {{ entradas | divisa }} </td>
+                            </tr>
+
+                            <tr *ngIf="empresa?.alquileres!" style="color: black;">
+                                <td colspan="2"> Efectivo Alquileres </td>
+                                <td> {{ alqEfectivo | divisa }} </td>
+                            </tr>
+
+                            <tr style="color: black;">
+                                <td colspan="2"> Salidas </td>
+                                <td> -{{ salidas | divisa }} </td>
+                            </tr>
+
+                            <tr style="color: black;">
+                                <td colspan="2"> devolucion </td>
+                                <td> -{{ totalDevolucion | divisa }} </td>
+                            </tr>
+
+                            <tr class="border-top">
+                                <td colspan="2"> Total </td>
+                                <td class="fw-bold"> {{ (parqueos + inicial + efectivo + abEfectivo + entradas + alqEfectivo! + salidas) - (totalDevolucion) | divisa }} </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-auto p-2">
+
+            <div class="card shadow px-2" style="width: 18rem;">
+
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Ventas del dia</h5>
+                </div>
+
+                <div class="table-responsive ">
+                    <table class="table table-borderless table-hover table-sm animated fadeIn ">
+
+                        <tbody>
+
+                            <tr style="color: black;">
+                                <td colspan="2"> En Efectivo </td>
+                                <td> {{ efectivo | divisa }} </td>
+                            </tr>
+                            <tr style="color: black;">
+                                <td colspan="2"> Con tarjeta </td>
+                                <td> {{ tarjeta | divisa }} </td>
+                            </tr>
+                            <tr style="color: black;">
+                                <td colspan="2"> Con Transferencia </td>
+                                <td> {{ transferencia | divisa }} </td>
+                            </tr>
+
+                            <ng-container *ngIf="bancos.length > 0">
+                                <tr *ngFor="let banco of bancos">
+                                    <td colspan="2"> {{ banco.name }} </td>
+                                    <td> {{ banco.monto | divisa }} </td>
+                                </tr>
+                            </ng-container>
+
+                            <tr style="color: black;">
+                                <td colspan="2"> devolucion </td>
+                                <td> -{{ devolucion | divisa }} </td>
+                            </tr>
+
+                            <tr class="border-top">
+                                <td colspan="2"> Total </td>
+                                <td class="fw-bold"> {{ (efectivo + tarjeta + transferencia + totalBancos ) - totalDevolucion | divisa }} </td>
+                            </tr>
+
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-auto p-2 ">
+
+            <div class="card shadow px-2 bg-success border-0" style="width: 18rem;">
+
+                <div class="card-body text-white">
+                    <h4 class="card-title mb-0 text-center">Ventas Totales</h4>
+                    <h5 class="text-center"> {{ montos | divisa }} </h5>
+                </div>
+
+            </div>
+
+            <div *ngIf="empresa?.tip" class="card shadow px-2 my-3 bg-info border-0" style="width: 18rem;">
+
+                <div class="card-body text-white">
+                    <h4 class="card-title mb-0 text-center">Propinas</h4>
+                    <h5 class="text-center"> {{ propinas | divisa }} </h5>
+                </div>
+
+            </div>
+
+            <div *ngIf="empresa?.tip" class="card shadow px-2 my-3 bg-success border-0" style="width: 18rem;">
+
+                <div class="card-body text-white">
+                    <h4 class="card-title mb-0 text-center">Ventas totales + Propinas</h4>
+                    <h5 class="text-center"> {{ montos + propinas | divisa }} </h5>
+                </div>
+
+            </div>
+
+            <div *ngIf="user.privilegios.cierre !== false && user.role !== 'CASHIER'" class="card shadow px-2 my-3 bg-dark border-0" style="width: 18rem;">
+
+                <div class="card-body text-white">
+                    <h4 class="card-title mb-0 text-center">Ganancia Total</h4>
+                    <h5 class="text-center"> {{ (efectivo + tarjeta + transferencia + vales + totalBancos) - costo | divisa}} </h5>
+                </div>
+
+            </div>
+
+            <div class="card shadow px-2 my-3 bg-warning border-0" style="width: 18rem;">
+
+                <div class="card-body text-white">
+                    <h4 class="card-title mb-0 text-center">Ventas a Creditos</h4>
+                    <h5 class="text-center"> {{ totalCreditos | divisa }} </h5>
+                </div>
+
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+    <div class="row d-flex justify-content-center">
+
+        <div class="col-auto p-2">
+
+            <div class="card shadow px-2" style="width: 18rem;">
+
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Salidas</h5>
+                </div>
+
+                <div class="table-responsive ">
+                    <table class="table table-borderless table-hover table-sm animated fadeIn ">
+
+                        <tbody>
+
+                            <ng-container *ngFor="let movimiento of movimientos">
+
+                                <tr *ngIf="movimiento.type === 'salida'">
+
+                                    <td colspan="2"> {{ movimiento.descripcion }} </td>
+                                    <td [ngClass]="{ 'text-danger':  movimiento.type == 'salida'}">
+                                        {{ movimiento.monto | divisa }}
+                                    </td>
+                                </tr>
+
+                            </ng-container>
+
+
+
+                            <tr class="border-top">
+                                <td colspan="2"> Total </td>
+                                <td class="fw-bold"> {{ salidas | divisa }} </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-auto p-2">
+
+            <div class="card shadow px-2" style="width: 18rem;">
+
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Entradas</h5>
+                </div>
+
+                <div class="table-responsive ">
+                    <table class="table table-borderless table-hover table-sm animated fadeIn ">
+
+                        <tbody>
+
+                            <ng-container *ngFor="let movimiento of movimientos">
+
+                                <tr *ngIf="movimiento.type === 'entrada'">
+
+                                    <td colspan="2"> {{ movimiento.descripcion }} </td>
+                                    <td [ngClass]="{ 'text-danger':  movimiento.type == 'salida'}">
+                                        {{ movimiento.monto | divisa }}
+                                    </td>
+                                </tr>
+
+                            </ng-container>
+
+                            <tr class="border-top">
+                                <td colspan="2"> Total </td>
+                                <td class="fw-bold"> {{ entradas | divisa }} </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+    <!-- DEPARTMENTS -->
+
+    <div class="d-flex justify-content-center">
+
+        <div class="col-auto p-2">
+
+            <div class="card shadow px-2" style="width: 18rem;">
+
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Departamentos</h5>
+                </div>
+
+                <div class="table-responsive ">
+                    <table class="table table-borderless table-hover table-sm animated fadeIn ">
+                        <thead>
+                            <th colspan="2">Departamento</th>
+                            <th class="text-center">Cant</th>
+                            <th class="text-end">Monto</th>
+                        </thead>
+
+                        <tbody>
+
+                            <ng-container *ngFor="let deparment of departamento">
+
+                                <tr *ngIf="deparment.qty > 0">
+
+                                    <td colspan="2"> {{ deparment.name }} </td>
+                                    <td class="text-center">
+                                        {{ deparment.qty | number }}
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="fw-bolder">
+                                            {{ deparment.monto | divisa }}
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </ng-container>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-auto p-2">
+
+            <div class="card shadow px-2" style="width: 18rem;">
+
+                <div class="card-body">
+                    <h5 class="card-title mb-0">ABONOS CREDITOS NEW</h5>
+                </div>
+
+                <div class="table-responsive ">
+                    <table class="table table-borderless table-hover table-sm animated fadeIn ">
+
+                        <tbody>
+
+                            <tr>
+                                <td colspan="2"> Abono con Efectivo </td>
+                                <td class="text-end">
+                                    <span class="fw-bolder">
+                                        {{ abEfectivo | divisa }}
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2"> Abono con Tarjetas </td>
+                                <td class="text-end">
+                                    <span class="fw-bolder">
+                                        {{ abTarjeta | divisa }}
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2"> Abono con Transferencias </td>
+                                <td class="text-end">
+                                    <span class="fw-bolder">
+                                        {{ abTransferencia | divisa }}
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <ng-container *ngIf="bancosAbonos.length > 0">
+                                <tr *ngFor="let banco of bancosAbonos">
+                                    <td colspan="2">
+                                        {{ banco.name }} </td>
+                                    <td class="text-end">
+                                        <span class="fw-bolder">
+                                            {{ banco.monto | divisa }} 
+                                        </span>
+                                    </td>
+                                </tr>
+                            </ng-container>
+
+                            <tr class="border-top">
+                                <td colspan="2"> Total </td>
+                                <td class="fw-bold"> {{ abEfectivo + abTarjeta + abTransferencia + totalBancosAbono | divisa }} </td>
+                            </tr>
+
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-auto p-2" *ngIf="empresa?.alquileres!">
+
+            <div class="card shadow px-2" style="width: 18rem;">
+
+                <div class="card-body">
+                    <h5 class="card-title mb-0">ALQUILERES</h5>
+                </div>
+
+                <div class="table-responsive ">
+                    <table class="table table-borderless table-hover table-sm animated fadeIn ">
+
+                        <tbody>
+
+                            <tr>
+                                <td colspan="2"> Abono con Efectivo </td>
+                                <td class="text-end">
+                                    <span class="fw-bolder">
+                                        {{ alqEfectivo | divisa }}
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <ng-container *ngIf="bancosAlquileres.length > 0">
+                                <tr *ngFor="let banco of bancosAlquileres">
+                                    <td colspan="2">
+                                        {{ banco.name }} </td>
+                                    <td class="text-end">
+                                        <span class="fw-bolder">
+                                            {{ banco.monto | divisa }} 
+                                        </span>
+                                    </td>
+                                </tr>
+                            </ng-container>
+
+                            <tr class="border-top">
+                                <td colspan="2"> Total </td>
+                                <td class="fw-bold"> {{ totalAlquiler | divisa }} </td>
+                            </tr>
+
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- DEVOLUCIONES -->
+
+    <div class="col-auto p-2">
+
+        <div class="card shadow px-2">
+
+            <div class="card-body">
+                <h5 class="card-title mb-0">DEVOLUCIONES</h5>
+            </div>
+
+            <div class="table-responsive table-sm">
+                <table class="table table-borderless table-hover table-sm animated fadeIn ">
+                    <thead>
+                        <tr>
+                            <th>Factura</th>
+                            <th>Codigo</th>
+                            <th>Cant.</th>
+                            <th>Precio</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr *ngIf="turno?.devolucion.length === 0 ">
+                            <td colspan="5">Sin devoluciones</td>
+                        </tr>
+
+                        <tr *ngFor="let devolucion of turno?.devolucion">
+                            <td> <a [routerLink]="['/dashboard/factura/', devolucion.factura._id]"> {{ devolucion.factura.invoice }} </a> </td>
+                            <td> {{ devolucion.product.code! }} </td>
+                            <td> {{ devolucion.qty }} </td>
+                            <td> {{ devolucion.price }} </td>
+                            <td> {{ devolucion.monto }} </td>
+                        </tr>
+
+                        <tr class="border-top">
+                            <td colspan="2"> Total </td>
+                            <td class="fw-bold"> {{ totalDevolucion | divisa }} </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- DEPARTMENTS -->
+
+</div>
+
+<!-- CIERRE CIEGO -->
+<div *ngIf="!user.privilegios.cierre" class="container my-5">
+    <div class="bg-body-tertiary p-5 rounded">
+        <div class="col-sm-8 py-5 mx-auto">
+            <h1 class="display-5 fw-normal">Cerrar Caja</h1>
+            <p>Asegurate de asignar el valor correcto del efectivo que tienes en caja</p>
+            <p>
+                <button [disabled]="user.cerrada" (click)="corte()" type="button" class="btn btn-primary" role="button">Hacer Cierre</button>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+    BODY
+========================================================================= -->
+
+<!-- =========================================================================
+    MODAL CIERRE DE CAJA
+========================================================================= -->
+<div class="modal fade" id="cierre" tabindex="-1" aria-labelledby="cierreModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cierreModal"><i class="bi-arrow-left-right" style="font-size: 1rem"></i> Cierre </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body mb-4">
+
+                <!-- AGREGAR TOTAL EFECTIVO DE CAJA -->
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr style="color: black;">
+                                <td scope="row">Efectivo esperado en caja:</td>
+                                <td>{{ (parqueos + inicial + efectivo + abEfectivo + entradas + alqEfectivo! + salidas) - (totalDevolucion) | divisa }}</td>
+                                <td>{{ (parqueos + inicial + efectivo + abEfectivo + entradas + alqEfectivo! + salidas) - (totalDevolucion) | divisa }}</td>
+                            </tr>
+
+                            <tr style="color: black;">
+                                <td scope="row">Cuanto efectivo hay en caja</td>
+                                <td>
+                                    <div class="form-group">
+                                        <input type="number" name="" id="" class="form-control" placeholder="efectivo en caja" aria-describedby="helpId" (keyup)="cajaA.value" #cajaA>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr style="color: black;">
+                                <td scope="row"> Diferencia </td>
+                                <td [ngClass]=" {   'text-danger': (inicial + efectivo + abEfectivo + entradas + alqEfectivo + salidas - cajaA.value) - totalDevolucion !== 0, 
+                                                    'text-success': (inicial + efectivo + abEfectivo + entradas + alqEfectivo + salidas - cajaA.value) - totalDevolucion > 0
+                                }">
+                                    {{ cajaA.value - (parqueos + inicial + efectivo + abEfectivo + entradas + alqEfectivo + salidas ) - totalDevolucion | divisa}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p class="mb-2" *ngIf="(inicial + efectivo + abEfectivo + entradas + alqEfectivo + salidas - cajaA.value ) - totalDevolucion !== 0 "> <i class="bi-exclamation-triangle"></i> Existe una diferencia, todo va a quedar almacenado </p>
+                    <p class="mb-2" *ngIf="(inicial + efectivo + abEfectivo + entradas + alqEfectivo + salidas - cajaA.value ) - totalDevolucion === 0"> <i class="bi-check2-all"></i> Todo en orden</p>
+
+                    <button type="button" class="btn btn-primary" (click)="cerrarTurno(cajaA.value)">Hacer cierre</button>
+
+                </div>
+                <!-- AGREGAR TOTAL EFECTIVO DE CAJA -->
+
+                <!-- ============================================================================
+                    IMPRIMIR 
+                ================================================================================= -->
+                <div>
+                    <div id="printDiv" style="color: black!important; background: #fff;">
+                        <!-- VENTAS TOTALES Y GANANCIAS -->
+
+                        <div style="color: black;" class="col-auto p-2" *ngIf="fechaCierre">
+                            <h5 class="h5 fw-bold mb-0 text-break">Fecha: {{ fechaCierre | date: "medium" }}</h5>
+                        </div>
+
+
+                        <div style="color: black;" class="col-auto p-2" *ngIf="diferencia" style="width: 18rem;">
+
+                            <table class="table text-center">
+                                <thead>
+                                    <tr style="color: black;">
+                                        <th scope="col">Diferencia</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="color: black;">
+                                        <th scope="row">{{ montoDiferencia | divisa }} </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <div style="color: black;" class="col-auto p-2" style="width: 18rem;">
+
+                            <table class="table text-center">
+                                <thead>
+                                    <tr style="color: black;">
+                                        <th scope="col">Ventas Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="color: black;">
+                                        <th scope="row">{{ (parqueos + efectivo + credito + tarjeta + transferencia + vales + totalBancos) | divisa }} </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <div style="color: black;" *ngIf="user.privilegios.cierre" class="col-auto p-2" style="width: 18rem;">
+
+                            <table class="table text-center">
+                                <thead>
+                                    <tr style="color: black;">
+                                        <th scope="col">Ganancia Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="color: black;">
+                                        <th scope="row">{{ (efectivo + tarjeta + transferencia + vales + totalBancos) - costo | divisa }} </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <div style="color: black;" class="col-auto p-2" style="width: 18rem;">
+
+                            <table class="table text-center">
+                                <thead>
+                                    <tr style="color: black;">
+                                        <th scope="col">Ventas a creditos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="color: black;">
+                                        <th scope="row">{{ totalCreditos | divisa }} </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <div style="color: black;" *ngIf="empresa?.tip" class="col-auto p-2" style="width: 18rem;">
+
+                            <table class="table text-center">
+                                <thead>
+                                    <tr style="color: black;">
+                                        <th scope="col">Propinas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="color: black;">
+                                        <th scope="row">{{ propinas | divisa }} </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <!-- VENTAS TOTALES Y GANANCIAS -->
+
+                        <!-- DINERO EN CAJA -->
+                        <div style="color: black;" class="col-auto p-2" style="width: 18rem;">
+
+                            <div class="card-body">
+                                <h5 class="card-title mb-0 text-center" style="color: black;">Dinero en Caja</h5>
+                            </div>
+
+                            <table class="table table-borderless table-hover table-sm ">
+
+                                <tbody style="color: black;">
+
+                                    <tr style="color: black;">
+                                        <td colspan="2"> Fondo Caja </td>
+                                        <td> {{ inicial | divisa }}</td>
+                                    </tr>
+                                    <tr style="color: black;">
+                                        <td colspan="2"> Ventas en efectivo </td>
+                                        <td> {{ efectivo | divisa }} </td>
+                                    </tr>
+
+                                    <tr *ngIf="empresa?.parqueadero" style="color: black;">
+                                        <td colspan="2"> Parqueadero </td>
+                                        <td> {{ parqueos | divisa }} </td>
+                                    </tr>
+
+                                    <tr style="color: black;">
+                                        <td colspan="2"> Abonos en efectivo </td>
+                                        <td> {{ abEfectivo | divisa }} </td>
+                                    </tr>
+                                    <tr *ngIf="empresa?.alquileres!" style="color: black;">
+                                        <td colspan="2"> Abonos de Alquileres </td>
+                                        <td> {{ alqEfectivo | divisa }} </td>
+                                    </tr>
+                                    <tr style="color: black;">
+                                        <td colspan="2"> Entradas </td>
+                                        <td> {{ entradas | divisa }} </td>
+                                    </tr>
+                                    <tr style="color: black;">
+                                        <td colspan="2"> Salidas </td>
+                                        <td> -{{ salidas | divisa }} </td>
+                                    </tr>
+                                    <tr style="color: black;">
+                                        <td colspan="2"> devolucion </td>
+                                        <td> -{{ devolucion | divisa }} </td>
+                                    </tr>
+                                    <tr class="border-top">
+                                        <td colspan="2"> Total </td>
+                                        <td class="fw-bold"> {{ (parqueos + inicial + efectivo + abEfectivo + entradas + alqEfectivo! + salidas) - (totalDevolucion) | divisa }}</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <!-- DINERO EN CAJA -->
+
+                        <!-- VENTAS DEL DIA -->
+                        <div style="color: black;" class="col-auto p-2" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title mb-0 text-center">Ventas del dia</h5>
+                            </div>
+
+                            <div class="table-responsive ">
+                                <table class="table table-borderless table-hover table-sm ">
+
+                                    <tbody>
+
+                                        <tr style="color: black;">
+                                            <td colspan="2"> En Efectivo </td>
+                                            <td> {{ efectivo | divisa }} </td>
+                                        </tr>
+                                        <tr style="color: black;">
+                                            <td colspan="2"> Con tarjeta </td>
+                                            <td> {{ tarjeta | divisa }} </td>
+                                        </tr>
+                                        <tr style="color: black;">
+                                            <td colspan="2"> Con Transferencia </td>
+                                            <td> {{ transferencia | divisa }} </td>
+                                        </tr>
+
+                                        <ng-container *ngIf="bancos.length > 0">
+                                            <tr style="color: black;" *ngFor="let banco of bancos">
+                                                <td colspan="2"> {{ banco.name }} </td>
+                                                <td> {{ banco.monto | divisa }} </td>
+                                            </tr>
+                                        </ng-container>
+
+                                        <tr style="color: black;">
+                                            <td colspan="2"> devolucion </td>
+                                            <td> -{{ devolucion | divisa }} </td>
+                                        </tr>
+
+                                        <tr style="color: black;" class="border-top">
+                                            <td colspan="2"> Total </td>
+                                            <td class="fw-bold"> {{ (efectivo + tarjeta + transferencia + totalBancos + credito + vales) - totalDevolucion | divisa }} </td>
+                                        </tr>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- VENTAS DEL DIA -->
+
+                        <!-- TOTAL ENTRADAS -->
+                        <div style="color: black;" class="col-auto p-2" style="width: 18rem;">
+
+                            <div class="card-body">
+                                <h5 class="card-title mb-0 text-center">Entradas</h5>
+                            </div>
+
+                            <div class="table-responsive ">
+                                <table class="table table-borderless table-hover table-sm ">
+
+                                    <tbody>
+
+                                        <ng-container *ngFor="let movimiento of movimientos">
+
+                                            <tr style="color: black;" *ngIf="movimiento.type === 'entrada'">
+
+                                                <td colspan="2"> {{ movimiento.descripcion }} </td>
+                                                <td>
+                                                    <span *ngIf=" movimiento.type === 'salida'">-</span> {{ movimiento.monto | divisa }}
+                                                </td>
+                                            </tr>
+
+                                        </ng-container>
+
+                                        <tr class="border-top">
+                                            <td colspan="2"> Total </td>
+                                            <td class="fw-bold"> {{ entradas | divisa }} </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        <!-- TOTAL ENTRADAS -->
+
+                        <!-- TOTAL SALIDAS -->
+                        <div style="color: black;" class="col-auto p-2" style="width: 18rem;">
+
+                            <div class="card-body">
+                                <h5 class="card-title mb-0 text-center">Salidas</h5>
+                            </div>
+
+                            <div class="table-responsive ">
+                                <table class="table table-borderless table-hover table-sm ">
+
+                                    <tbody>
+
+                                        <ng-container *ngFor="let movimiento of movimientos">
+
+                                            <tr *ngIf="movimiento.type === 'salida'">
+
+                                                <td colspan="2"> {{ movimiento.descripcion }} </td>
+                                                <td [ngClass]="{ 'text-danger':  movimiento.type == 'salida'}">
+                                                    {{ movimiento.monto | divisa }}
+                                                </td>
+                                            </tr>
+
+                                        </ng-container>
+
+                                        <tr class="border-top">
+                                            <td colspan="2"> Total </td>
+                                            <td class="fw-bold"> {{ salidas | divisa }} </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        <!-- TOTAL SALIDAS -->
+
+                        <!-- TOTAL DEPARTAMENTOS -->
+                        <div style="color: black;" class="col-auto p-2" style="width: 18rem;">
+
+                            <div class="card-body">
+                                <h5 class="card-title mb-0">Departamentos</h5>
+                            </div>
+
+                            <div class=" ">
+                                <table class="table table-borderless table-hover table-sm ">
+
+                                    <thead>
+                                        <th class="text-start">Departamento</th>
+                                        <th class="text-center">Cant.</th>
+                                        <th class="text-end">Monto</th>
+                                    </thead>
+
+                                    <tbody>
+
+                                        <ng-container *ngFor="let deparment of departamento">
+
+                                            <tr style="color: black;" *ngIf="deparment.qty > 0">
+
+                                                <td class="text-start text-break"> {{ deparment.name }} </td>
+                                                <td class="text-center">
+                                                    {{ deparment.qty | number }}
+                                                </td>
+                                                <td class="text-end">
+                                                    <span class="fw-bolder">
+                                                            {{ deparment.monto | divisa }}
+                                                        </span>
+                                                </td>
+                                            </tr>
+
+
+                                        </ng-container>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        <!-- TOTAL DEPARTAMENTOS -->
+
+                        <!-- ABONOS CREDITOS -->
+                        <div style="color: black;" class="col-auto p-2" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title mb-0 text-center">Abonos Creditos</h5>
+                            </div>
+
+                            <div class="table-responsive ">
+                                <table class="table table-borderless table-hover table-sm ">
+
+                                    <tbody>
+
+                                        <tr style="color: black;">
+                                            <td colspan="2"> En Efectivo </td>
+                                            <td> {{ abEfectivo | divisa }} </td>
+                                        </tr>
+                                        <tr style="color: black;">
+                                            <td colspan="2"> Con tarjeta </td>
+                                            <td> {{ abTarjeta | divisa }} </td>
+                                        </tr>
+                                        <tr style="color: black;">
+                                            <td colspan="2"> Con Transferencia </td>
+                                            <td> {{ abTransferencia | divisa }} </td>
+                                        </tr>
+
+                                        <ng-container *ngIf="bancos.length > 0">
+                                            <tr style="color: black;" *ngFor="let banco of bancosAbonos">
+                                                <td colspan="2"> {{ banco.name }} </td>
+                                                <td>
+                                                    {{ banco.monto | divisa }}
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+
+                                        <tr style="color: black;" class="border-top">
+                                            <td colspan="2"> Total </td>
+                                            <td class="fw-bold"> {{ (abEfectivo) + (abTarjeta) + (abTransferencia) + (totalBancosAbono) | divisa }} </td>
+                                        </tr>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ABONOS CREDITOS -->
+
+                        <!-- ABONOS ALQUILERES -->
+                        <div *ngIf="empresa?.alquileres!" style="color: black;" class="col-auto p-2" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title mb-0 text-center">Abonos Alquileres</h5>
+                            </div>
+
+                            <div class="table-responsive ">
+                                <table class="table table-borderless table-hover table-sm ">
+
+                                    <tbody>
+
+                                        <tr style="color: black;">
+                                            <td colspan="2"> En Efectivo </td>
+                                            <td> {{ alqEfectivo | divisa }} </td>
+                                        </tr>
+
+                                        <ng-container *ngIf="bancos.length > 0">
+                                            <tr style="color: black;" *ngFor="let banco of bancosAlquileres">
+                                                <td colspan="2"> {{ banco.name }} </td>
+                                                <td>
+                                                    {{ banco.monto | divisa }}
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+
+                                        <tr style="color: black;" class="border-top">
+                                            <td colspan="2"> Total </td>
+                                            <td class="fw-bold"> {{ totalAlquiler | divisa }} </td>
+                                        </tr>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ABONOS ALQUILERES -->
+
+                    </div>
+                </div>
+
+                <!-- NEW -->
+                <!-- <div class="d-flex justify-content-center"> -->
+
+                <!-- SECCION DE IMPRESIOM -->
+                <!-- <div id="printDiv">
+
+                        <div class="col-auto p-2">
+                            <div class="card-body" *ngIf="fechaCierre">
+                                <h5 class="card-title mb-0 text-center">Fecha: {{ fechaCierre | date: "medium" }}</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-auto p-2">
+                            <div class="border-0" *ngIf="diferencia" style="width: 18rem;">
+
+                                <table class="table text-center">
+                                    <thead>
+                                        <tr style="color: black;">
+                                            <th scope="col">Diferencia</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="color: black;">
+                                            <th scope="row">{{ montoDiferencia | divisa }} </th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                        <div class="col-auto p-2">
+
+                            <table class="table text-center">
+                                <thead>
+                                    <tr style="color: black;">
+                                        <th scope="col">Ventas Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="color: black;">
+                                        <th scope="row">{{ efectivo + credito + tarjeta + transferencia + vales | divisa }} </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <div class="col-auto p-2">
+                            <table class="table text-center">
+                                <thead>
+                                    <tr style="color: black;">
+                                        <th scope="col">Ganancia Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="color: black;">
+                                        <th scope="row">{{ (efectivo + credito + tarjeta + transferencia + vales) - costo | divisa }} </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-auto p-2" *ngIf="montoDiferencia !== 0">
+
+                            <div [ngClass]=" {   'bg-danger': montoDiferencia < 0, 
+                                            'bg-success': montoDiferencia > 0
+                            }" class="card shadow px-2 border-0" style="width: 18rem;">
+
+                                <div class="card-body text-white">
+                                    <h5 class="card-title mb-0 text-center">Diferencia</h5>
+                                    <p class="text-center mb-0"> {{ montoDiferencia| divisa }} </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-auto p-2">
+                            <div class="card shadow px-2" style="width: 18rem;">
+
+                                <div class="card-body">
+                                    <h5 class="card-title mb-0">Dinero en caja</h5>
+                                </div>
+
+                                <div class="table-responsive ">
+                                    <table class="table table-borderless table-hover table-sm ">
+
+                                        <tbody>
+
+                                            <tr style="color: black;">
+                                                <td colspan="2"> Fondo Caja  </td>
+                                                <td> {{ inicial| divisa }}</td>
+                                            </tr>
+                                            <tr style="color: black;">
+                                                <td colspan="2"> Ventas en efectivo  </td>
+                                                <td> {{ efectivo| divisa }} </td>
+                                            </tr>
+                                            <tr style="color: black;">
+                                                <td colspan="2"> Abonos en efectivo  </td>
+                                                <td> {{ abEfectivo| divisa }} </td>
+                                            </tr>
+                                            <tr style="color: black;">
+                                                <td colspan="2"> Entradas  </td>
+                                                <td> {{ entradas| divisa }} </td>
+                                            </tr>
+                                            <tr style="color: black;">
+                                                <td colspan="2"> Salidas  </td>
+                                                <td> {{ salidas| divisa }} </td>
+                                            </tr>
+                                            <tr class="border-top">
+                                                <td colspan="2"> Total  </td>
+                                                <td class="fw-bold"> {{ inicial + efectivo + abEfectivo + entradas + salidas| divisa }} </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-auto p-2">
+
+                            <div class="card shadow px-2" style="width: 18rem;">
+
+                                <div class="card-body">
+                                    <h5 class="card-title mb-0">Ventas del dia</h5>
+                                </div>
+
+                                <div class="table-responsive ">
+                                    <table class="table table-borderless table-hover table-sm ">
+
+                                        <tbody>
+
+                                            <tr style="color: black;">
+                                                <td colspan="2"> En Efectivo  </td>
+                                                <td> {{ efectivo| divisa }} </td>
+                                            </tr>
+                                            <tr style="color: black;">
+                                                <td colspan="2"> Con tarjeta  </td>
+                                                <td> {{ tarjeta| divisa }} </td>
+                                            </tr>
+                                            <tr style="color: black;">
+                                                <td colspan="2"> Con Transferencia  </td>
+                                                <td> {{ transferencia| divisa }} </td>
+                                            </tr>
+                                            <tr class="border-top">
+                                                <td colspan="2"> Total  </td>
+                                                <td class="fw-bold"> {{ montos| divisa }} </td>
+                                            </tr>
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-auto p-2">
+                            <div class="card shadow px-2" style="width: 18rem;">
+
+                                <div class="card-body">
+                                    <h5 class="card-title mb-0">Salidas</h5>
+                                </div>
+
+                                <div class="table-responsive ">
+                                    <table class="table table-borderless table-hover table-sm ">
+
+                                        <tbody>
+
+                                            <ng-container *ngFor="let movimiento of movimientos">
+
+                                                <tr *ngIf="movimiento.type === 'salida'">
+
+                                                    <td colspan="2"> {{ movimiento.descripcion }}  </td>
+                                                    <td [ngClass]="{ 'text-danger':  movimiento.type == 'salida'}">
+                                                        {{ movimiento.monto| divisa }}
+                                                    </td>
+                                                </tr>
+
+                                            </ng-container>
+
+                                            <tr class="border-top">
+                                                <td colspan="2"> Total  </td>
+                                                <td class="fw-bold"> {{ salidas| divisa }} </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-auto p-2">
+                            <div class="card shadow px-2" style="width: 18rem;">
+
+                                <div class="card-body">
+                                    <h5 class="card-title mb-0">Entradas</h5>
+                                </div>
+
+                                <div class="table-responsive ">
+                                    <table class="table table-borderless table-hover table-sm ">
+
+                                        <tbody>
+
+                                            <ng-container *ngFor="let movimiento of movimientos">
+
+                                                <tr *ngIf="movimiento.type === 'entrada'">
+
+                                                    <td colspan="2"> {{ movimiento.descripcion }}  </td>
+                                                    <td [ngClass]="{ 'text-danger':  movimiento.type == 'salida'}">
+                                                        {{ movimiento.monto| divisa }}
+                                                    </td>
+                                                </tr>
+
+                                            </ng-container>
+
+                                            <tr class="border-top">
+                                                <td colspan="2"> Total  </td>
+                                                <td class="fw-bold"> {{ entradas| divisa }} </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-auto p-2">
+                            <div class="card shadow px-2" style="width: 18rem;">
+
+                                <div class="card-body">
+                                    <h5 class="card-title mb-0">Departamentos</h5>
+                                </div>
+
+                                <div class="table-responsive ">
+                                    <table class="table table-borderless table-hover table-sm ">
+
+                                        <thead>
+                                            <th class="text-start">Departamento</th>
+                                            <th class="text-center">Cant.</th>
+                                            <th class="text-end">Monto</th>
+                                        </thead>
+
+                                        <tbody>
+
+                                            <ng-container *ngFor="let deparment of departamento">
+
+                                                <tr *ngIf="deparment.qty > 0">
+
+                                                    <td class="text-start" colspan="2"> {{ deparment.name }} </td>
+                                                    <td class="text-center">
+                                                        {{ deparment.qty | number }}
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span class="fw-bolder">
+                                                            {{ deparment.monto | divisa }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+
+
+                                            </ng-container>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div> -->
+
+                <!-- </div> -->
+                <!-- ============================================================================
+                    IMPRIMIR 
+                ================================================================================= -->
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================================
+    MODAL CIERRE DE CAJA
+========================================================================= -->
