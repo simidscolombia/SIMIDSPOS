@@ -1,0 +1,428 @@
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+<header>
+    <div class="bg-header-yellow py-2 px-3 mb-2">
+        <h5 class="text-white m-0">PRODUCTOS</h5>
+    </div>
+    <ul class="nav nav-tabs px-3" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link text-dark active" id="administracion-tab" [routerLink]="['/dashboard', 'productos']">
+                <i class="bi-files" style="font-size: 1rem"></i> Administracion de Productos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-primary" id="nuevo-tab" [routerLink]="['/dashboard/productos', 'nuevo']"><i class="bi-pencil-square" style="font-size: 1rem"></i> Crear Producto</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark " id="departamentos-tab" [routerLink]="['/dashboard/productos', 'departamento']"><i class="bi-collection" style="font-size: 1rem"></i> Departamentos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" id="departamentos-tab" [routerLink]="['/dashboard/productos', 'categorias']" aria-selected="false"><i class="bi-collection" style="font-size: 1rem"></i> Categorias</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" id="departamentos-tab" [routerLink]="['/dashboard/productos', 'movimientos']" aria-selected="false"><i class="bi-collection" style="font-size: 1rem"></i> Movimientos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" id="departamentos-tab" [routerLink]="['/dashboard/productos', 'kardex']" aria-selected="false"><i class="bi-collection" style="font-size: 1rem"></i> kardex</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" id="eliminados-tab" [routerLink]="['/dashboard/productos', 'eliminados']" aria-selected="false"><i class="bi-trash" style="font-size: 1rem"></i> Eliminados</a>
+        </li>
+    </ul>
+</header>
+<!-- =========================================================================
+    HEADER 
+========================================================================= -->
+
+<!-- =========================================================================
+    BODY 
+========================================================================= -->
+<div class="tab-content mt-4 bg-light2" id="myTabContent">
+
+    <!-- TAB 1 -->
+    <div class="tab-pane fade show active" id="administracion" role="tabpanel" aria-labelledby="administracion-tab">
+        <div class="container-fluid">
+            <!-- TITLE - SUBTITLE -->
+            <div>
+                <h5 class="text-dark">ADMINISTRACIÓN DE PRODUCTOS</h5>
+                <p>Administra todos los productos de forma centralizada.</p>
+            </div>
+            <!-- TITLE - SUBTITLE -->
+
+            <div class="row">
+
+                <div class="col-md-2">
+
+                    <div class="shadow-lg p-3 mb-5 rounded bg-white">
+
+                        <h4 class="text-muted">Filtros</h4>
+
+                        <div>
+                            <h6 class="text-muted">Agotados</h6>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" (change)="cargarProductos('agotados', agotados.checked)" type="checkbox" id="flexSwitchCheckChecked" #agotados>
+                                <label class="form-check-label" for="flexSwitchCheckChecked">Agotados</label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div>
+                            <h6 class="text-muted">Vencidos</h6>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" (change)="cargarProductos('vencidos', vencidos.checked)" type="checkbox" id="flexSwitchCheckChecked" #vencidos>
+                                <label class="form-check-label" for="flexSwitchCheckChecked">Vencidos</label>
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div>
+                            <h6 class="text-muted">Departamentos</h6>
+                            <select class="form-select" aria-label="Default select example" #departamentos (change)="cargarProductos('', false, departamentos.value)">
+                                <option value="none" selected>Todos</option>
+
+                                <ng-container *ngFor="let departmento of listaDepartamentos">
+                                    <option *ngIf="departmento.status" value="{{departmento.did}}">{{departmento.name}}</option>
+                                </ng-container>
+
+                            </select>
+                        </div>
+
+                        <hr>
+
+                        <div>
+                            <h6 class="text-muted">Reparar Inventario</h6>
+                            <button type="button" (click)="repararInventario()" class="btn btn-primary btn-sm btn-block">Reparar</button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- PRODUCTOS LISTA COMPLETA -->
+                <div class="col-md-10">
+
+                    <!-- TABLE PRODUCTS -->
+                    <div class="shadow-lg p-3 mb-5 rounded bg-white">
+
+                        <!-- CARGANDO -->
+                        <div *ngIf="cargando">
+                            <div class="text-center p-4">
+                                <div class="spinner-grow text-secondary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            <small class="text-muted">cargando...</small>
+                        </div>
+                        <!-- CARGANDO -->
+
+                        <div *ngIf="!cargando">
+                            <div>
+
+                                <div class="d-flex flex-wrap">
+
+                                    <div>
+                                        <p class="mb-0">Inventario:</p>
+                                        <h4 class="display-6"> {{ inventario | number }} </h4>
+                                    </div>
+
+                                    <div class="ms-auto text-end">
+                                        <h4 *ngIf="user.role === 'ADMIN'" class="mb-0 text-success"> Ganancia total {{ (totalPrice - totalCost) | divisa }} </h4>
+                                        <small *ngIf="user.role === 'ADMIN'" class="mb-0 text-muted"> Total de venta {{ totalPrice | divisa}} </small>
+                                        <small *ngIf="user.role === 'ADMIN'" class="mb-0 text-muted"> Total de inversión {{ totalCost | divisa}} </small>
+
+                                        <div class="my-2">
+                                            <button class="btn btn-info btn-sm mr-2" data-bs-toggle="modal" data-bs-target="#updateExcel"> Actualizar Lote</button>
+                                            <button class="btn btn-primary btn-sm mr-2" data-bs-toggle="modal" data-bs-target="#ivaAll"> Cambiar Impuestos</button>
+                                            <button *ngIf="user.role === 'ADMIN'" (click)="exportar()" class="btn btn-success btn-sm"> Exportar</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-floating mb-2">
+                                    <span class="position-absolute top-50 start-90 translate-middle"><i class=" bi-search " style="font-size: 1rem "></i></span>
+                                    <input type="text" class="form-control" id="floatingInput" placeholder="Buscar Producto" (keyup)="buscar(search.value)" #search>
+                                    <label for="floatingInput ">Buscar Producto</label>
+                                </div>
+
+                                <div class="alert alert-info" *ngIf="inventarioB > 0">
+
+                                    <p class="mb-0 text-wrap"> Detalles del departamento: <span class="text-capitalize fw-bold"> {{ productos[0].department!.name }} </span> </p>
+                                    <hr class="my-1">
+                                    <div class="d-flex flex-wrap">
+
+                                        <div class="col-sm-12 col-md-4 text-wrap">
+                                            Inventario: <span class="fw-bold"> {{ inventarioB | number }} </span>
+                                        </div>
+                                        <div class="col-sm-12 col-md-4 text-wrap">
+                                            Total Inversion: <span class="fw-bold"> {{ costoB | divisa }} </span>
+                                        </div>
+                                        <div class="col-sm-12 col-md-4 text-wrap">
+                                            Total Venta: <span class="fw-bold"> {{ precioB | divisa }} </span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="table-responsive ">
+                                <table class="table table-borderless table-striped table-hover table-sm animated fadeIn ">
+                                    <thead class="border-bottom ">
+                                        <tr>
+                                            <th></th>
+                                            <th class="text-muted " scope="col ">#</th>
+                                            <th class="text-muted " scope="col "></th>
+                                            <th class="text-muted " scope="col ">Codigo</th>
+                                            <th class="text-muted " scope="col " colspan="2">Nombre</th>
+                                            <th class="text-muted " scope="col ">Departamento</th>
+                                            <th class="text-muted " scope="col ">stock</th>
+                                            <th class="text-muted " scope="col ">Tipo</th>
+                                            <th class="text-muted " scope="col ">Costo</th>
+                                            <th class="text-muted " scope="col ">Ganancia</th>
+                                            <th class="text-muted " scope="col ">Precio</th>
+                                            <th class="text-muted " scope="col ">Precio Mayor</th>
+                                            <th class="text-muted w100 " scope="col ">Acciones</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngIf="!sinResultados" class="text-center ">
+                                            <th colspan="14" class="py-4">
+                                                <h4 class="text-muted">Sin Resultados</h4>
+                                            </th>
+                                        </tr>
+
+                                        <ng-container *ngFor="let producto of productos; let i=index ">
+
+                                            <tr class="trHover" [ngClass]=" { 'table-danger': producto.vencido}" (mouseover)="btnAddInv= true" (mouseout)="btnAddInv= false">
+
+                                                <!-- BTN ADD -->
+                                                <td>
+                                                    <button [disabled]="user.role !== 'ADMIN'" type="button" class="btn btn-link text-success fw-bold fs-5 p-0" data-bs-toggle="modal" data-bs-target="#ajustarInventario" (click)="product = producto">
+                                                        <i class="bi-plus"></i>
+                                                    </button>
+                                                </td>
+                                                <!-- BTN ADD -->
+
+                                                <th class="align-items-center" *ngIf=" desde===0 " scope="row ">{{ i + 1}}</th>
+                                                <th class="align-items-center" *ngIf="desde> 0" scope="row">{{ (i + 1) + desde }}</th>
+                                                <td>
+                                                    <img [src]="producto.img | imagen:'products'" class="avatar avatar-img" alt="">
+                                                </td>
+                                                <td><small>{{ producto.code }}</small></td>
+
+                                                <td colspan="2">
+                                                    {{ producto.name }}
+                                                    <span *ngIf="producto.status && producto.low && !producto.out" class="badge rounded-pill bg-warning text-dark">Bajo</span>
+                                                    <span *ngIf="producto.status && producto.out" class="badge rounded-pill bg-danger">Agotado</span>
+                                                    <span *ngIf="producto.status && producto.vencido" class="badge rounded-pill bg-danger">Vencido</span>
+                                                    <span *ngIf="!producto.status" class="badge rounded-pill bg-danger">Eliminado</span>
+                                                </td>
+
+                                                <td>
+                                                    <span *ngIf="producto.department">{{ producto.department.name }}</span>
+                                                    <span *ngIf="!producto.department"> Sin Departamento </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span *ngIf="producto.type === 'Granel'"> {{  producto.inventario | number:'1.3'}} </span>
+                                                    <span *ngIf="producto.type !== 'Granel'"> {{  producto.inventario | number }} </span>
+                                                </td>
+                                                <td>{{ producto.type }}</td>
+                                                <td>{{ producto.cost | divisa }}</td>
+                                                <td>{{ producto.gain }}%</td>
+                                                <td>{{ producto.price | divisa }}</td>
+                                                <td>{{ producto.wholesale | divisa }}</td>
+                                                <td class="text-center">
+                                                    <a [routerLink]="['/dashboard/producto', producto.pid]" class="btn btn-link p-1 text-primary"><i class="bi bi-box-arrow-up-right"></i></a>
+                                                    <button type="button" (click)="borrarProducto(producto.pid)" class="btn btn-link p-1 text-danger"><i class="bi-trash" style="font-size: 0.9rem"></i></button>
+                                                </td>
+                                            </tr>
+
+                                        </ng-container>
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                            <!-- BTN SIGUIENTE Y ANTERIOR -->
+                            <div class="row">
+                                <div class="col col-md-4">
+                                    <small class="text-muted">Total de items: ({{totalProductos}})</small>
+                                    <small *ngIf="resultado !== 0" class="text-muted"> - (Resultados: {{ resultado }})</small>
+                                    <small *ngIf="desde !== 0" class="text-muted"> - (Desde el: {{ desde + 1}} Hasta el: {{ desde + productos.length }})</small>
+                                </div>
+
+                                <div *ngIf="search.value.length === 0" class="col d-flex justify-content-end">
+                                    <button type="button" (click)="cambiarPagina(-10)" class="{{btnAtras}} btn btn-sm btn-dark btnW waves-effect waves-light px-3">Anterior</button>
+                                    <button type="button" (click)="cambiarPagina(10)" class="{{btnAdelante}} btn btn-sm btn-dark btnW waves-effect waves-light px-3 ms-2">Siguiente</button>
+                                </div>
+                            </div>
+                            <!-- BTN SIGUIENTE Y ANTERIOR -->
+
+                        </div>
+                    </div>
+                    <!-- TABLE PRODUCTS -->
+
+                </div>
+                <!-- PRODUCTOS LISTA COMPLETA -->
+
+            </div>
+
+
+
+        </div>
+    </div>
+    <!-- TAB 1 -->
+
+    <!-- =========================================================================
+    MODAL AJUSTAR INVENTARIO
+========================================================================= -->
+
+    <div class="modal fade" id="ajustarInventario" tabindex="-1" aria-labelledby="ajustarInventarioModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-break" id="ajustarInventarioModal">
+
+                        <small class="badge rounded-pill bg-danger text-white h6" *ngIf="product?.out">Agotado</small>
+                        <span class="badge rounded-pill bg-warning text-white" *ngIf="product?.low">Bajo</span>
+
+                        <p class="mb-0">
+                            {{ product?.name }}
+                        </p>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="">
+                        <p class="text-center mb-0">Stock</p>
+                        <h4 class="text-center display-1"> {{ product?.inventario }} </h4>
+                    </div>
+
+                    <div class="d-flex justify-content-center flex-wrap">
+
+                        <div class="col-auto">
+                            <label for="cantidad" class="visually-hidden">Cantidad</label>
+                            <input type="number" class="form-control" min="0" id="cantidad" placeholder="cantidad" #cantidad>
+                        </div>
+
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary mb-3" (click)="ajustar('entrada', cantidad.value)"> Agregar </button>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- =========================================================================
+    MODAL AJUSTAR INVENTARIO
+========================================================================= -->
+
+
+</div>
+<!-- =========================================================================
+    BODY 
+========================================================================= -->
+
+<!-- =========================================================================
+    IVA A TODOS LOS PRODUCTOS
+========================================================================= -->
+<div class="modal fade" id="ivaAll" tabindex="-1" aria-labelledby="ivaAllModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ivaAllModal"> Actualizar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+
+                <form id="newClientForm" autocomplete="off" [formGroup]="ivaForm" (ngSubmit)="ivaAll()">
+
+                    <!-- =======================================================================
+                        DATOS PERSONALES 
+                    =========================================================================== -->
+                    <h5 class="text-muted">Actualizar impuesto a todos los productos</h5>
+
+                    <div class="form-floating">
+                        <select formControlName="taxid" id="taxIva" type="text" class="form-control text-capitalize">
+                            <option value="" selected>Seleccionar tipo de impuesto</option>
+                            <option [value]="impuesto.taxid" *ngFor="let impuesto of impuestos"> {{ impuesto.name }} - {{ impuesto.valor }}% </option>
+                        </select>
+                        <label for="taxIva">Tipo de impuesto</label>
+                    </div>
+
+                    <div class="form-check mt-2">
+                        <input formControlName="tax" class="form-check-input" type="checkbox" value="" id="tax">
+                        <label class="form-check-label" for="tax">
+                            Impuesto
+                        </label>
+                    </div>
+
+
+                    <button type="submit" class="btn btnW waves-effect waves-ligth px-3 btn-primary">Actualizar</button>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================================
+    IVA A TODOS LOS PRODUCTOS 
+========================================================================= -->
+
+<!-- =========================================================================
+    ACTUALIZAR TODOS LOS PRODUCTOS DESDE EL EXCEL
+========================================================================= -->
+<div class="modal fade" id="updateExcel" tabindex="-1" aria-labelledby="updateExcelModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateExcelModal"> Actualizar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <h4 class="text-muted">Importar Productos <span> <a class="btn btn-sm text-primary" type="button" (click)="plantilla()" >Descargar Plantilla</a> </span></h4>
+
+                <div class="row">
+                    <div class="col-10">
+                        <input type="file" class="form-control form-control-sm" (change)="selectFileExcel($event)" placeholder="Importar" accept=".xlsx">
+                    </div>
+                    <div class="col-auto">
+                        <button [disabled]="sendLote" type="button" class="btn btn-sm btnW btn-primary waves-effect waves-light mt-2" (click)="UploadExcel()">
+                            <span *ngIf="!sendLote">
+                                Importar
+                            </span>
+                            <span *ngIf="sendLote">
+                                Enviando...                                
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================================
+    ACTUALIZAR TODOS LOS PRODUCTOS DESDE EL EXCEL 
+========================================================================= -->
