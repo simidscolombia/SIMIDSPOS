@@ -1,0 +1,171 @@
+<div *ngIf="vencido" class="alert alert-warning d-flex align-items-center mb-0" role="alert">
+    <div>
+        <i class="fw-bold bi bi-exclamation-triangle-fill"></i> <span class="fw-bold ms-1"> Atención: </span> {{ empresa.msgv || 'Recuerda hacer el pago de la nube antes del 5, para evitar que se desactive!. Si ya realizaste el pago, envia el comprobante, gracias por preferirnos!' }}
+    </div>
+</div>
+<header class="bg-dark border-bottom">
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary rounded" aria-label="Eleventh navbar example">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white text-uppercase" routerLink="./"> {{ empresaT.name || 'SIMIDS' }} </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample09" aria-controls="navbarsExample09" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="bi bi-list text-white"></span>
+            </button>
+
+            <div class="navbar-collapse collapse" id="navbarsExample09" style="">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" aria-current="page" routerLink="./ventas"> Ventas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./clientes"> Clientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./facturas"> Facturas</a>
+                    </li>
+                    <li class="nav-item" *ngIf="empresa?.comandas">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./comandas"> Comandas</a>
+                    </li>
+                    <li class="nav-item" *ngIf="empresa?.alquileres">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./alquileres"> Alquileres</a>
+                    </li>
+                    <li class="nav-item" *ngIf="empresa?.taller">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./vehiculos"> Vehiculos</a>
+                    </li>
+                    <li class="nav-item" *ngIf="empresa?.parqueadero">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./configuracion/parqueadero"> Parqueadero</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./configuracion/compras"> Compras</a>
+                    </li>
+                    <li class="nav-item" *ngIf="empresa?.domi">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./domicilios"> Domicilios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./productos"> Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./calendario"> Calendario</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./corte"> Corte</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" routerLinkActive="activeH" routerLink="./configuracion"> Configuracion</a>
+                    </li>
+                </ul>
+            </div>
+
+            <a class="text-white-50 align-items-center" href="whatsapp://send?text=Hola,+necesito+que+me+ayuden+con+algo!&phone=+{{empresaT.phone}}" target="_blank"> 
+                <i class="bi bi-whatsapp fs-4"></i>
+            </a>
+            <div class="dropdown btn-group dropstart">
+                <!-- WHATSAPP -->
+                
+                <!-- DROWPDOWN -->
+                <button class="btn text-white" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="avatar shadow" >
+                        <img class="avatar-img img-fluid border border-2 border-light" [src]="user.getImage" >
+                    </div>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-dark bg-dark" aria-labelledby="dropdownMenuButton">
+
+                    <h6 class="dropdown-header">
+                        <div class="avatar avatar-lg me-2">
+                            <img class="avatar-img img-fluid border border-2 border-light" [src]="user.getImage">
+                        </div>
+                        <div class="dropdown-user-details">
+                            <div class="dropdown-user-details-name">{{ user.name }}</div>
+                            <small class="dropdown-user-details-email text-center">{{ user.usuario }}</small>
+                        </div>
+                    </h6>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item text-white" routerLink="./perfil">Perfil</a></li>
+                    <li><a class="dropdown-item cursor text-white" (click)="logout()">Salir</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- <div class="px-2">
+        <div class="bg-dark clearfix">
+
+            <a class="navbar-brand float-start text-white " routerLink="./"> SIMIDS </a>
+            <div class="dropdown float-end">
+                <button class="btn text-white" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="avatar shadow" >
+                        <img class="avatar-img img-fluid border border-2 border-light" [src]="user.getImage" >
+                    </div>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark bg-dark" aria-labelledby="dropdownMenuButton">
+
+                    <h6 class="dropdown-header d-flex align-items-center">
+                        <div class="avatar avatar-lg me-2">
+                            <img class="avatar-img img-fluid border border-2 border-light" [src]="user.getImage">
+                        </div>
+                        <div class="dropdown-user-details">
+                            <div class="dropdown-user-details-name">{{ user.name }}</div>
+                            <small class="dropdown-user-details-email text-center">{{ user.usuario }}</small>
+                        </div>
+                    </h6>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" routerLink="./perfil">Perfil</a></li>
+                    <li><a class="dropdown-item cursor" (click)="logout()">Salir</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light p-0 py-3" aria-label="Eighth navbar example">
+        <div class="px-2">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsExample07">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item p-1">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" aria-current="page" routerLink="./ventas"><i class="bi-cart2" style="font-size: 1rem"></i> Ventas</a>
+                    </li>
+                    <li class="nav-item p-1">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./clientes"><i class="bi-people" style="font-size: 1rem"></i> Clientes</a>
+                    </li>
+                    <li class="nav-item p-1">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./facturas"><i class="bi-receipt" style="font-size: 1rem"></i> Facturas</a>
+                    </li>
+                    <li class="nav-item p-1" *ngIf="empresa?.comandas">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./comandas"><i class="bi-app" style="font-size: 1rem"></i> Comandas</a>
+                    </li>
+                    <li class="nav-item p-1" *ngIf="empresa?.alquileres">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./alquileres"><i class="bi-hourglass" style="font-size: 1rem"></i> Alquileres</a>
+                    </li>
+                    <li class="nav-item p-1" *ngIf="empresa?.parqueadero">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./configuracion/parqueadero"><i class="bi-car-front" style="font-size: 1rem"></i> Parqueadero</a>
+                    </li>
+                    <li class="nav-item p-1" *ngIf="empresa?.domi">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./domicilios"><i class="bi-geo-alt" style="font-size: 1rem"></i> Domicilios</a>
+                    </li>
+                    <li class="nav-item p-1">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./productos"><i class="bi-file-spreadsheet" style="font-size: 1rem"></i> Productos</a>
+                    </li>
+                    <li class="nav-item p-1">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./calendario"><i class="bi-calendar3" style="font-size: 1rem"></i> Calendario</a>
+                    </li>
+                    <li class="nav-item p-1">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./corte"><i class="bi-bar-chart" style="font-size: 1rem"></i> Corte</a>
+                    </li>
+                    <li class="nav-item p-1">
+                        <a class="nav-link btnW waves-effect waves-grey px-3 mx-1" routerLinkActive="activeBtn" routerLink="./configuracion"><i class="bi-gear" style="font-size: 1rem"></i> Configuracion</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </nav> -->
+</header>
